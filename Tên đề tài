@@ -1,0 +1,103 @@
+Tiếng Anh: Nền tảng
+Quản lý Cuộc thi Nhiếp ảnh Phim sử dụng AI 3.1.2. Tiếng Việt: Nền tảng tổ chức và quản lý cuộc thi nhiếp ảnh phim tích hợp trí tuệ nhân tạo (
+*) 3.2. Nội dung đề xuất chính (bao gồm kết quả và sản phẩm)
+a) Bối cảnh:
+Nhiếp ảnh phim đã trải qua sự hồi sinh đáng kể trong những năm gần đây, thu hút một cộng đồng ngày càng lớn gồm các nhiếp ảnh gia, câu lạc bộ nhiếp ảnh, các cơ sở giáo dục và phòng thí nghiệm phim độc lập. Cùng với xu hướng này, các cuộc thi nhiếp ảnh phim đã trở thành một nền tảng quan trọng để thúc đẩy sự sáng tạo, bảo tồn văn hóa nhiếp ảnh analog và kết nối các nhiếp ảnh gia yêu thích kỹ thuật nhiếp ảnh truyền thống.
+Khác với các cuộc thi nhiếp ảnh kỹ thuật số, các cuộc thi nhiếp ảnh phim yêu cầu ban tổ chức không chỉ quản lý các tệp hình ảnh kỹ thuật số mà còn cả thông tin kỹ thuật liên quan đến từng bức ảnh, như phim gốc, máy ảnh, ống kính, định dạng phim, phòng thí nghiệm phát triển, quy trình quét và trong một số trường hợp, các tham chiếu âm bản hoặc bảng tiếp xúc. Những yêu cầu bổ sung này làm cho việc tổ chức cuộc thi trở nên phức tạp hơn rất nhiều.
+Hiện nay, nhiều cuộc thi nhiếp ảnh phim vẫn được quản lý bằng các công cụ riêng biệt như biểu mẫu trực tuyến, bảng tính, email, lưu trữ đám mây và mạng xã hội. Cách tiếp cận phân mảnh này làm tăng khối lượng công việc hành chính, làm cho việc xác minh bài nộp trở nên khó khăn, làm phức tạp quá trình chấm điểm và hạn chế việc quản lý lâu dài dữ liệu cuộc thi. Ngoài ra, người tham gia thường thiếu một nền tảng tập trung để quản lý lịch sử cuộc thi và các bộ sưu tập ảnh phim.
+Do đó, việc phát triển một nền tảng quản lý chuyên biệt cho các cuộc thi nhiếp ảnh phim là cần thiết để số hóa hoạt động cuộc thi, nâng cao hiệu quả quản lý, chuẩn hóa các hoạt động đánh giá và thiết lập một kho lưu trữ tập trung các tác phẩm nhiếp ảnh phim phục vụ cho các triển lãm, giáo dục và phát triển cộng đồng trong tương lai.
+
+b) Giải pháp đề xuất:
+Dự án này đề xuất phát triển một nền tảng web và di động hỗ trợ quản lý toàn diện các cuộc thi nhiếp ảnh phim, từ lập kế hoạch cuộc thi, đăng ký người tham gia đến xác minh bài dự thi, chấm điểm, công bố kết quả và lưu trữ kỹ thuật số.
+Khác với các hệ thống thi nhiếp ảnh truyền thống, nền tảng này tập trung vào đặc điểm của nhiếp ảnh analog. Mỗi bài gửi đều kèm theo thông tin ảnh chi tiết, bao gồm phim, thân máy, ống kính, ISO, định dạng phim, số khung hình, phòng thí nghiệm tráng hình, thông số quét và tùy chọn các tài liệu tham khảo âm bản hoặc bảng tiếp xúc. Những hồ sơ này cải thiện khả năng truy xuất nguồn gốc và giúp các nhà tổ chức xác minh tính xác thực của các tác phẩm đã gửi.
+Nền tảng này cũng cung cấp một môi trường chấm điểm chuyên biệt, nơi các giám khảo đánh giá các bức ảnh dựa trên các tiêu chí có thể cấu hình được thiết kế riêng cho nhiếp ảnh phim. Sau mỗi cuộc thi, các bức ảnh đoạt giải cùng thông tin kỹ thuật của chúng được lưu giữ trong kho lưu trữ kỹ thuật số, tạo nên nguồn tài nguyên quý giá cho các cuộc thi, triển lãm và hoạt động giáo dục trong tương lai.
+Trí tuệ nhân tạo được tích hợp để hỗ trợ ban tổ chức phát hiện các bài dự thi trùng lặp, nhận diện hình ảnh do AI tạo ra, tự động phân loại ảnh và tạo các báo cáo phân tích hỗ trợ quản lý cuộc thi.
+Vai trò hệ thống
+- Quản trị viên
+- Quản lý người dùng và quyền truy cậpOns.
+- Cấu hình cài đặt hệ thống.
+- Quản lý dữ liệu chủ.
+- Giám sát hoạt động của nền tảng.
+- Duy trì cấu hình cuộc thi.
+- Tổ chức cuộc thi
+- Tạo và cấu hình các cuộc thi nhiếp ảnh.
+- Xác định các hạng mục cuộc thi và tiêu chí chấm điểm.
+- Quản lý đăng ký người tham gia.
+- Xác minh các bài dự thi gửi đi.
+- Phân công thẩm phán.
+- Công bố kết quả cuộc thi.
+- Quản lý giải thưởng và triển lãm trực tuyến.
+- Thẩm phán
+- Xem xét các bài dự thi được giao.
+- Đánh giá ảnh dựa trên tiêu chí cuộc thi.
+- Cung cấp nhận xét và điểm số.
+- Tham gia nhiều vòng đánh giá.
+- Xác nhận kết quả đánh giá cuối cùng.
+- Người tham gia (Nhiếp ảnh gia phim)
+- Quản lý hồ sơ cá nhân.
+- Đăng ký tham gia các cuộc thi.
+- Gửi ảnh.
+- Duy trì thông tin cuộn phim và khung.
+- Theo dõi trạng thái nộp.
+- Nhận kết quả cuộc thi và phản hồi.
+* Ứng dụng trí tuệ nhân tạo để hỗ trợ xác minh bài dự thi và nâng cao hiệu quả quản lý cuộc thi. Các ứng dụng AI như:
+- Phát hiện các bức ảnh trùng lặp hoặc rất giống nhau.
+- Xác định hình ảnh do AI tạo ra.
+- Tự động tạo từ khóa và phân loại ảnh.
+- Sản xuất báo cáo thống kê và phân tích cuộc thi.
+- Học tập dựa trên nghiên cứu (RBL) - Chủ đề nghiên cứu
+- Quản lý
+tài sản số - Thị giác
+máy tính - Phát hiện
+hình ảnh do AI tạo ra - Phát hiện
+tương đồng hình ảnh - Hệ thống
+
+quản lý cuộc thi trực tuyến c) Yêu cầu chức năng:
+*** Luồng lõi kinh doanh Luồng
+lõi 1. Lập kế hoạch và cấu hình
+cuộc thi Ban tổ chức cuộc thi tạo ra các cuộc thi mới bằng cách xác định chủ đề, hạng mục, thời gian gửi bài, lịch trình chấm điểm, tiêu chí đánh giá, cấu trúc giải thưởng và quy định của cuộc thi. Nền tảng hỗ trợ các mẫu tái sử dụng, giúp đơn giản hóa việc tổ chức các cuộc thi định kỳ đồng thời cho phép các quy tắc khác nhau cho từng sự kiện.
+Core Flow 2. Gửi phim và Quản lý
+Metadata Người tham gia gửi ảnh kèm theo thông tin kỹ thuật đầy đủ mô tả cách từng hình ảnh được tạo ra. Ngoài việc tải lên các bức ảnh quét, người dùng còn ghi lại các chi tiết như thương hiệu phim, phim gốc, ISO, máy ảnh, ống kính, số khung hình, địa điểm chụp, phòng thí nghiệm phát triển và các tiêu chuẩn quét. Nền tảng duy trì mối quan hệ giữa cuộn phim, từng khung hình riêng lẻ và các tác phẩm dự thi, cung cấp tài liệu toàn diện cho từng tác phẩm nhiếp ảnh.
+Core Flow 3. Xác minh
+bài dự thi Trước khi bắt đầu chấm điểm, nền tảng sẽ kiểm tra xem mỗi bài dự thi có đáp ứng yêu cầu của cuộc thi hay không. Hệ thống kiểm tra định dạng tệp, chất lượng hình ảnh, thời hạn nộp và tính đầy đủ của thông tin kỹ thuật. Xác minh hỗ trợ AI giúp xác định hình ảnh trùng lặp, phát hiện nội dung do AI tạo ra và đánh dấu các bài dự thi đáng ngờ để ban tổ chức cuộc thi xem xét thủ công.
+Core Flow 4. Ban giám khảo và đánh giá Quản lý
+Cuộc thi phân bổ giám khảo theo các hạng mục hoặc vòng đánh giá. Ban giám khảo đánh giá ảnhbiểu đồ sử dụng các tiêu chí chấm điểm có thể cấu hình, bao gồm sáng tạo nghệ thuật, bố cục, kể chuyện, thực thi kỹ thuật, hạt phim, dải tông màu, kết xuất màu sắc và chất lượng quét. Nền tảng tự động tổng hợp điểm số, xếp hạng các bài nộp và lưu trữ hồ sơ đánh giá chi tiết để minh bạch.
+Core Flow 5. Công bố kết quả và lưu trữ kỹ thuật số
+Sau khi chấm điểm hoàn tất, nền tảng sẽ tính toán thứ hạng cuối cùng và công bố kết quả chính thức của cuộc thi. Những bức ảnh đoạt giải được lưu giữ trong kho lưu trữ kỹ thuật số cùng với siêu dữ liệu kỹ thuật, nhận xét của ban giám khảo, thông tin cuộc thi và hồ sơ lịch sử. Kho lưu trữ này là nguồn tài nguyên lâu dài cho các triển lãm, hoạt động giáo dục và các cuộc thi trong tương lai.
+
+d) Yêu cầu phi chức năng:
+- Xác thực và ủy quyền phải được thực hiện bằng JWT với kiểm soát truy cập dựa trên vai trò.
+- Hình ảnh và tài sản kỹ thuật số phải được lưu trữ an toàn bằng dịch vụ lưu trữ đám mây.
+- Kiến trúc phần mềm phải theo thiết kế mô-đun để tạo điều kiện mở rộng và bảo trì.
+- Nền tảng sẽ hỗ trợ nhiều cuộc thi đồng thời và các hoạt động chấm điểm đồng thời.
+
+e) Lý thuyết & Thực hành:
+Lý thuyết và Thực hành (Tài liệu)
+- Ứng dụng Web: ReactJS / Next.js
+- Ứng dụng di động: Flutter
+- Backend: ASP.NET Core Web API hoặc Node.js (Express)
+- Cơ sở dữ liệu: PostgreSQL hoặc MySQL
+- Tích hợp AI: Thị giác máy tính, API OpenAI, Phát hiện
+tương đồng hình ảnh - Lưu trữ đám mây: Firebase Storage hoặc Azure Blob
+Storage - Triển khai đám mây: Microsoft Azure / Firebase
+- Kiểm soát phiên bản: GitHub
+Dự án tích hợp Kỹ thuật Phần mềm, Quản lý Tài sản Kỹ thuật số, Thị giác Máy tính, Trí tuệ Nhân tạo và Điện toán Đám mây để phát triển một nền tảng chuyên biệt để tổ chức và quản lý các cuộc thi nhiếp ảnh phim trong môi trường thực tế.
+
+f) Sản phẩm (Sản phẩm dự kiến):
+Sản phẩm
+Sản phẩm Sản phẩm dự kiến bao gồm:
+- Cổng quản lý trực tuyến dành cho ban tổ chức và giám khảo cuộc thi.
+- Ứng dụng web/di động để người tham gia đăng ký và gửi ảnh phim.
+- Hệ thống quản trị nền tảng.
+- Một mô-đun AI hỗ trợ xác minh bài dự thi và phân tích cuộc thi.
+- Kho lưu trữ kỹ thuật số chứa các bức ảnh đoạt giải và hồ sơ lịch sử cuộc thi.
+
+g) Nhiệm vụ đề xuất:
+Nhiệm vụ
+đề xuất số Trách nhiệm
+Nhiệm vụ 1 Phân tích yêu cầu, thiết kế kiến trúc hệ thống, thiết kế cơ sở dữ liệu và phát triển
+API backend 2 Phát triển ứng dụng web/di động cho người tham gia, bao gồm quản lý hồ sơ, đăng ký cuộc thi, gửi phim và theo dõi bài dự thi 1
+3 Phát triển cổng thông tin ban tổ chức và giám khảo, bao gồm cấu hình cuộc thi, quản lý bài dự thi, quy trình làm việc đánh giá, báo cáo và quản lý lưu trữ kỹ thuật số 2
+4 Nghiên cứu và tích hợp các mô hình AI để phát hiện hình ảnh trùng lặp, phát hiện hình ảnh do AI tạo ra, phân loại hình ảnh tự động và phân tích cuộc thi 3
+5 Tích hợp hệ thống, kiểm thử, triển khai, tài liệu kỹ thuật và báo cáo Capstone cuối cùng Tất cả s
+. Khác nhận xét (đề xuất tất cả các yếu tố tương đối nếu có):
