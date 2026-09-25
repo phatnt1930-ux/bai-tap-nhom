@@ -1,0 +1,102 @@
+\documentclass[12pt,a4paper]{report}
+
+% --- Hỗ trợ tiếng Việt cho cả hai trình biên dịch ---
+% XeLaTeX / LuaLaTeX: dùng font Unicode, chạy được ở mọi nơi.
+% pdfLaTeX: dùng bảng mã T5, cần cài gói vntex.
+\usepackage{iftex}
+\ifPDFTeX
+    \usepackage[utf8]{inputenc}
+    \usepackage[T5]{fontenc}
+\else
+    \usepackage{fontspec}
+    \setmainfont{DejaVu Serif}
+    \setsansfont{DejaVu Sans}
+    \setmonofont{DejaVu Sans Mono}[Scale=0.85]
+\fi
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{amsmath}
+\geometry{a4paper, margin=1in}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, automata}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    backgroundcolor=\color{gray!5},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    breaklines=true,
+    frame=single,
+    showstringspaces=false
+}
+
+\renewcommand{\chaptername}{Chương}
+\renewcommand{\figurename}{Hình}
+\renewcommand{\tablename}{Bảng}
+\renewcommand{\contentsname}{Mục lục}
+
+\begin{document}
+
+% ================= TRANG BÌA =================
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+
+    {\fontsize{14pt}{1cm}\selectfont \textbf{TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI}} \\
+    {\fontsize{14pt}{1cm}\selectfont \textbf{THÀNH PHỐ HỒ CHÍ MINH}} \\
+    \vspace{1cm}
+
+    \vspace{1cm}
+
+    {\fontsize{20pt}{1cm}\selectfont \textbf{BÁO CÁO BÀI TẬP LỚN}} \\
+    \vspace{0.5cm}
+    {\fontsize{16pt}{1cm}\selectfont \textbf{MÔN: THIẾT KẾ CƠ SỞ DỮ LIỆU}} \\
+    \vspace{2.5cm}
+
+    {\fontsize{16pt}{1cm}\selectfont \textbf{Đề tài: Thiết kế cơ sở dữ liệu cho nền tảng quản lý cuộc thi nhiếp ảnh phim tích hợp AI}} \\
+
+    \vspace{3cm}
+
+   \begin{center}
+    \large
+    \textbf{Nhóm sinh viên thực hiện:}\\[0.5cm]
+    \renewcommand{\arraystretch}{1.3}
+    \setlength{\tabcolsep}{15pt} % Tự động căn chỉnh khoảng cách giữa các cột rộng rãi, đều đặn
+    \begin{tabular}{|c|l|c|}
+        \hline
+        \textbf{STT} & \textbf{Họ và tên} & \textbf{MSSV} \\ \hline
+        1 & Nguyễn Chí Hiếu & 2251040083 \\ \hline
+        2 & Nguyễn Tấn Phát & 079206021930 \\ \hline
+        3 & Trần Ngọc Bảo & 087206006474 \\ \hline
+        4 & Lê Phúc Thọ & 079206036366 \\ \hline
+    \end{tabular}
+\end{center}
+
+    \vfill
+
+    {\fontsize{14pt}{1cm}\selectfont \textbf{TP. HCM, Năm 2026}}
+\end{titlepage}
+% ================= HẾT TRANG BÌA =================
+
+\tableofcontents
+\newpage
+
+\include{chuong1}
+\include{chuong2}
+\include{chuong3}
+\include{chuong4}
+
+\end{document}
+
