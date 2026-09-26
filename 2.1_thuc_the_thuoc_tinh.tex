@@ -1,0 +1,189 @@
+\section{Xác định Các Thực thể và Thuộc tính}
+
+Dựa trên các đối tượng dữ liệu đã xác định ở Chương 1, mô hình quan niệm được quy hoạch quanh ba trục liên kết trung tâm: trục \texttt{Contest} tập trung toàn bộ cấu hình và bài dự thi; trục \texttt{Entry} nối giữa nhánh hồ sơ phim và nhánh chấm điểm; trục \texttt{AppUser} quy tụ mọi tác vụ có sự tham gia của con người.
+
+Mô hình gồm 14 đối tượng dữ liệu, tổ chức thành 4 phân hệ chức năng: 11 thực thể và 3 mối kết hợp nhiều--nhiều mang thuộc tính riêng (\texttt{ContestRole}, \texttt{ScoreDetail}, \texttt{DuplicateMatch}). Ba mối kết hợp này được liệt kê cùng các thực thể để thấy đủ thuộc tính; khi chuyển sang lược đồ logic, mỗi đối tượng trở thành một bảng. Phạm vi được giữ gọn có chủ đích: những thông tin chỉ xuất hiện một lần và không dùng để thống kê, như máy ảnh, ống kính hay phòng lab, được lưu thành cột văn bản thay vì tách thành bảng danh mục riêng.
+
+\subsection{Phân hệ Người dùng và Cuộc thi (Identity \& Contest)}
+
+\noindent\textbf{Thực thể \texttt{AppUser} (Người dùng):}
+
+\begin{itemize}
+    \item \texttt{UserId} (PK, IDENTITY): Mã định danh người dùng.
+    \item \texttt{Email} (NOT NULL, UNIQUE): Khóa nghiệp vụ dùng để đăng nhập.
+    \item \texttt{PasswordHash} (NOT NULL): Mã băm mật khẩu.
+    \item \texttt{FullName} (NOT NULL): Họ tên thật.
+    \item \texttt{Pseudonym} (NULL): Bút danh hiển thị khi công bố kết quả.
+    \item \texttt{DateOfBirth} (NULL): Ngày sinh, dùng để tính tuổi tại hạn nộp bài.
+    \item \texttt{IsLocked} (NOT NULL, DEFAULT 0): Tài khoản bị khóa thì không thao tác được.
+    \item \texttt{IsAdmin} (NOT NULL, DEFAULT 0): Quản trị viên hệ thống; quyền này áp dụng toàn hệ thống, không gắn với cuộc thi (BR-1).
+\end{itemize}
+
+\noindent\textbf{Thực thể \texttt{Contest} (Cuộc thi):}
+
+\begin{itemize}
+    \item \texttt{ContestId} (PK, IDENTITY): Mã định danh cuộc thi.
+    \item \texttt{ContestName} (NOT NULL): Tên cuộc thi.
+    \item \texttt{OrganizerName} (NOT NULL): Đơn vị đứng tên tổ chức.
+    \item \texttt{RegistrationOpenAt} (NOT NULL): Ngày mở đăng ký.
+    \item \texttt{SubmissionDeadline} (NOT NULL): Hạn nộp bài, phải sau ngày mở đăng ký.
+    \item \texttt{JudgingDeadline} (NOT NULL): Hạn chấm, phải sau hạn nộp bài.
+    \item \texttt{AnnouncementDate} (NULL): Ngày công bố kết quả.
+    \item \texttt{Status} (NOT NULL): Draft, Open, Judging, Announced.
+\end{itemize}
+
+\noindent\textbf{Mối kết hợp \texttt{ContestRole} (Giữ vai trò):}
+
+\begin{itemize}
+    \item \texttt{ContestRoleId} (PK, IDENTITY): Mã định danh bản ghi phân vai.
+    \item \texttt{UserId} (FK, NOT NULL): Người dùng được gán vai trò.
+    \item \texttt{ContestId} (FK, NOT NULL): Cuộc thi mà vai trò có hiệu lực.
+    \item \texttt{RoleType} (NOT NULL): Organizer, Judge hoặc Contestant.
+    \item \texttt{RulesAcceptedAt} (NULL): Thời điểm đồng ý thể lệ, chỉ dùng cho thí sinh.
+\end{itemize}
+
+\noindent\textbf{Thực thể \texttt{Category} (Hạng mục):}
+
+\begin{itemize}
+    \item \texttt{CategoryId} (PK, IDENTITY): Mã định danh hạng mục.
+    \item \texttt{ContestId} (FK, NOT NULL): Cuộc thi chứa hạng mục.
+    \item \texttt{CategoryName} (NOT NULL): Tên hạng mục, ví dụ Chân dung.
+    \item \texttt{EntryFormat} (NOT NULL): Single là ảnh đơn, Series là bộ ảnh.
+    \item \texttt{MinPhotos} (NOT NULL): Số ảnh tối thiểu của một bài.
+    \item \texttt{MaxPhotos} (NOT NULL): Số ảnh tối đa, không nhỏ hơn MinPhotos.
+    \item \texttt{MaxEntriesPerUser} (NOT NULL): Số bài tối đa một thí sinh được nộp.
+\end{itemize}
+
+\noindent\textbf{Thực thể \texttt{Criterion} (Tiêu chí chấm):}
+
+\begin{itemize}
+    \item \texttt{CriterionId} (PK, IDENTITY): Mã định danh tiêu chí.
+    \item \texttt{ContestId} (FK, NOT NULL): Cuộc thi áp dụng tiêu chí.
+    \item \texttt{CriterionName} (NOT NULL): Tên tiêu chí, ví dụ Bố cục.
+    \item \texttt{Weight} (NOT NULL): Trọng số tính theo phần trăm.
+    \item \texttt{MaxScore} (NOT NULL): Thang điểm tối đa của tiêu chí.
+\end{itemize}
+
+\subsection{Phân hệ Hồ sơ Phim (Film Provenance)}
+
+\noindent\textbf{Thực thể \texttt{FilmStock} (Loại phim):}
+
+\begin{itemize}
+    \item \texttt{FilmStockId} (PK, IDENTITY): Mã định danh loại phim.
+    \item \texttt{StockName} (NOT NULL): Tên thương mại của phim.
+    \item \texttt{Manufacturer} (NOT NULL): Hãng sản xuất.
+    \item \texttt{FilmType} (NOT NULL): ColorNegative, Slide hoặc BlackWhite.
+    \item \texttt{BoxSpeed} (NOT NULL): ISO danh định, thuộc loại phim chứ không thuộc cuộn (BR-4).
+    \item \texttt{StandardProcess} (NOT NULL): Quy trình tráng chuẩn: C-41, E-6, ECN-2, BW.
+    \item \texttt{IsVerified} (NOT NULL, DEFAULT 0): Đã được quản trị viên duyệt hay còn chờ duyệt.
+\end{itemize}
+
+\noindent\textbf{Thực thể \texttt{FilmRoll} (Cuộn phim):}
+
+\begin{itemize}
+    \item \texttt{FilmRollId} (PK, IDENTITY): Mã định danh cuộn phim.
+    \item \texttt{OwnerUserId} (FK, NOT NULL): Thí sinh sở hữu cuộn.
+    \item \texttt{FilmStockId} (FK, NOT NULL): Loại phim đã dùng (BR-2).
+    \item \texttt{FilmFormat} (NOT NULL): Khổ phim: 35mm, 120 hoặc 4x5.
+    \item \texttt{CameraModel} (NOT NULL): Máy ảnh dùng cho cả cuộn (BR-2).
+    \item \texttt{ExposureIndex} (NOT NULL): Độ nhạy đặt khi chụp, khác ISO danh định (BR-4).
+    \item \texttt{PushPullStops} (NOT NULL, DEFAULT 0): Mức push dương hoặc pull âm, tính bằng stop (BR-4).
+    \item \texttt{DevelopedBy} (NOT NULL): Lab hoặc Self; Self là lựa chọn riêng, không để trống.
+    \item \texttt{LabName} (NULL): Tên phòng lab; rỗng khi tự tráng.
+    \item \texttt{ActualProcess} (NOT NULL): Quy trình tráng thực tế; khác chuẩn nghĩa là tráng chéo.
+    \item \texttt{DevelopedOn} (NULL): Ngày tráng; không được trước ngày chụp.
+    \item \texttt{ProofImageUrl} (NULL): Ảnh dải phim hoặc hóa đơn lab chứng minh cuộn có thật.
+    \item \texttt{ProofStatus} (NOT NULL): Pending, Verified hoặc Rejected.
+\end{itemize}
+
+\noindent\textbf{Thực thể \texttt{Frame} (Khung hình):}
+
+\begin{itemize}
+    \item \texttt{FilmRollId} (PK, FK): Phần khóa mượn từ cuộn phim.
+    \item \texttt{FrameNo} (PK): Số khung in ở mép phim, ví dụ 12 hoặc 12A.
+    \item \texttt{ShotOn} (NULL): Ngày chụp; không được sau ngày tráng.
+    \item \texttt{ShotLocation} (NULL): Địa điểm chụp.
+    \item \texttt{LensNote} (NULL): Ống kính dùng cho khung này; thay đổi theo từng khung.
+\end{itemize}
+
+\subsection{Phân hệ Bài dự thi (Submission)}
+
+\noindent\textbf{Thực thể \texttt{Entry} (Bài dự thi):}
+
+\begin{itemize}
+    \item \texttt{EntryId} (PK, IDENTITY): Mã định danh nội bộ của bài dự thi.
+    \item \texttt{CategoryId} (FK, NOT NULL): Hạng mục dự thi.
+    \item \texttt{AuthorUserId} (FK, NOT NULL): Tác giả bài dự thi.
+    \item \texttt{EntryCode} (NOT NULL, UNIQUE): Mã ẩn danh giám khảo nhìn thấy (BR-6).
+    \item \texttt{Title} (NOT NULL): Tên bài dự thi.
+    \item \texttt{Status} (NOT NULL): Draft, Submitted, NeedsInfo, Accepted, Awarded, Rejected, Withdrawn (BR-5).
+    \item \texttt{SubmittedAt} (NULL): Thời điểm nộp; rỗng khi còn là bản nháp.
+    \item \texttt{RejectReason} (NULL): Lý do bị loại, bắt buộc khi Status là Rejected.
+    \item \texttt{FinalScore} (NULL): Điểm tổng chốt lúc công bố (BR-8).
+    \item \texttt{RankInCategory} (NULL): Thứ hạng trong hạng mục.
+    \item \texttt{PrizeName} (NULL): Giải đạt được; rỗng nếu không đoạt giải.
+    \item \texttt{FinalizedAt} (NULL): Thời điểm chốt kết quả; sau mốc này điểm không đổi.
+\end{itemize}
+
+\noindent\textbf{Thực thể \texttt{EntryPhoto} (Ảnh dự thi):}
+
+\begin{itemize}
+    \item \texttt{EntryPhotoId} (PK, IDENTITY): Mã định danh ảnh dự thi.
+    \item \texttt{EntryId} (FK, NOT NULL): Bài dự thi chứa ảnh.
+    \item \texttt{FilmRollId} (FK, NOT NULL): Phần khóa ngoại trỏ về khung hình gốc.
+    \item \texttt{FrameNo} (FK, NOT NULL): Phần còn lại của khóa ngoại trỏ về khung hình (BR-3).
+    \item \texttt{SequenceNo} (NOT NULL): Thứ tự ảnh trong bộ, không trùng trong cùng bài.
+    \item \texttt{ScanMethod} (NOT NULL): FilmScanner, FlatbedScanner, DslrScan hoặc LabScan (BR-2).
+    \item \texttt{ScannerModel} (NULL): Mẫu máy scan, ví dụ Frontier SP3000.
+    \item \texttt{EditLevel} (NOT NULL): None hoặc BasicOnly; cấm ghép ảnh (BR-2).
+    \item \texttt{FileUrl} (NOT NULL): Đường dẫn tệp scan gốc.
+    \item \texttt{PerceptualHash} (NULL): Mã băm cảm nhận, phát hiện ảnh giống sau chỉnh sửa.
+\end{itemize}
+
+\subsection{Phân hệ Chấm thi và Phân tích AI (Judging \& AI)}
+
+\noindent\textbf{Thực thể \texttt{ScoreSheet} (Phiếu chấm):}
+
+\begin{itemize}
+    \item \texttt{ScoreSheetId} (PK, IDENTITY): Mã định danh phiếu chấm.
+    \item \texttt{EntryId} (FK, NOT NULL): Bài dự thi được chấm.
+    \item \texttt{JudgeUserId} (FK, NOT NULL): Giám khảo chấm bài.
+    \item \texttt{Status} (NOT NULL): Draft hoặc Locked; đã Locked thì bất biến (BR-7).
+    \item \texttt{Comment} (NULL): Nhận xét chung của giám khảo về bài.
+    \item \texttt{LockedAt} (NULL): Thời điểm chốt phiếu.
+\end{itemize}
+
+\noindent\textbf{Mối kết hợp \texttt{ScoreDetail} (Chấm theo):}
+
+\begin{itemize}
+    \item \texttt{ScoreSheetId} (PK, FK): Phiếu chấm chứa điểm này.
+    \item \texttt{CriterionId} (PK, FK): Tiêu chí được chấm.
+    \item \texttt{Score} (NOT NULL): Điểm, phải nằm trong thang của tiêu chí (BR-5).
+\end{itemize}
+
+\noindent\textbf{Thực thể \texttt{AiAnalysis} (Kết quả phân tích):}
+
+\begin{itemize}
+    \item \texttt{AnalysisId} (PK, IDENTITY): Mã định danh kết quả phân tích.
+    \item \texttt{EntryPhotoId} (FK, NOT NULL): Ảnh dự thi được phân tích.
+    \item \texttt{ModelName} (NOT NULL): Tên mô hình đã sinh kết quả.
+    \item \texttt{ModelVersion} (NOT NULL): Phiên bản mô hình, bắt buộc có để truy vết.
+    \item \texttt{AnalysisType} (NOT NULL): Duplicate hoặc AiGenerated.
+    \item \texttt{Confidence} (NOT NULL): Điểm tin cậy do mô hình trả về.
+    \item \texttt{Verdict} (NOT NULL): Kết luận máy đưa ra.
+    \item \texttt{AnalyzedAt} (NOT NULL): Thời điểm phân tích.
+    \item \texttt{ReviewVerdict} (NULL): Kết luận cuối cùng của ban tổ chức.
+    \item \texttt{ReviewedByUserId} (FK, NULL): Người thẩm định.
+\end{itemize}
+
+\noindent\textbf{Mối kết hợp \texttt{DuplicateMatch} (Nghi trùng):}
+
+\begin{itemize}
+    \item \texttt{MatchId} (PK, IDENTITY): Mã định danh cặp nghi trùng.
+    \item \texttt{PhotoAId} (FK, NOT NULL): Ảnh thứ nhất của cặp.
+    \item \texttt{PhotoBId} (FK, NOT NULL): Ảnh thứ hai, cùng trỏ về EntryPhoto.
+    \item \texttt{Similarity} (NOT NULL): Độ tương đồng đo được.
+    \item \texttt{DetectedAt} (NOT NULL): Thời điểm phát hiện.
+    \item \texttt{ReviewStatus} (NOT NULL): Pending, Confirmed hoặc Dismissed.
+\end{itemize}
+

@@ -31,10 +31,10 @@ latexmk -xelatex main.tex    # hoặc XeLaTeX, dùng font DejaVu
 | --- | --- |
 | `main.tex` | Cấu hình, trang bìa, mục lục, gọi bốn chương |
 | `chuong1.tex`, `chuong1/` | Khảo sát yêu cầu và nghiệp vụ |
-| `chuong2.tex`, `chuong2/` | Mô hình dữ liệu quan niệm |
+| `chuong2.tex`, `chuong2/` | Mô hình dữ liệu quan niệm và sơ đồ ERD |
 | `chuong3.tex`, `chuong3/` | Mô hình logic, chuẩn hóa, từ điển dữ liệu |
 | `chuong4.tex`, `chuong4/` | Thiết kế vật lý và triển khai |
-| `images/` | Sơ đồ logic và sơ đồ thiết kế vật lý |
+| `images/` | Sơ đồ ERD mức quan niệm, sơ đồ logic và sơ đồ thiết kế vật lý |
 | `sql/` | Script khởi tạo cơ sở dữ liệu |
 | `main.pdf` | Báo cáo đã biên dịch |
 | `Tên đề tài` | Đề xuất đề tài ban đầu của nhóm |
