@@ -14,7 +14,7 @@ Dựa trên quy trình nghiệp vụ của hệ thống, các mối quan hệ gi
     \item \texttt{Category} -- Nhận -- \texttt{Entry} (1-N): Một hạng mục nhận nhiều bài dự thi.
     \item \texttt{AppUser} -- Sáng tác -- \texttt{Entry} (1-N): Một thí sinh nộp nhiều bài dự thi; mỗi bài có đúng một tác giả.
     \item \texttt{Entry} -- Gồm -- \texttt{EntryPhoto} (1-N): Một bài gồm một ảnh nếu là ảnh đơn, nhiều ảnh nếu là bộ ảnh.
-    \item \texttt{Entry} -- Được chấm bởi -- \texttt{AppUser} (N-N): Phân rã thành \texttt{ScoreSheet}, mang theo trạng thái chốt và nhận xét.
+    \item \texttt{Entry} -- Được chấm bởi -- \texttt{AppUser} (N-N): Mỗi cặp bài và giám khảo có một phiếu chấm mang trạng thái chốt và nhận xét. Phiếu chấm có vòng đời riêng và còn tham gia mối quan hệ với \texttt{Criterion}, nên được biểu diễn thành thực thể \texttt{ScoreSheet}, nối với \texttt{Entry} qua mối quan hệ Có phiếu và với giám khảo qua mối quan hệ Lập phiếu.
     \item \texttt{ScoreSheet} -- Chấm theo -- \texttt{Criterion} (N-N): Phân rã thành \texttt{ScoreDetail}, mang theo điểm số.
     \item \texttt{EntryPhoto} -- Được phân tích -- \texttt{AiAnalysis} (1-N): Một ảnh được phân tích nhiều lần, kết quả cũ không bị ghi đè.
     \item \texttt{AppUser} -- Thẩm định -- \texttt{AiAnalysis} (1-N, không bắt buộc): Một thành viên ban tổ chức thẩm định nhiều kết quả phân tích; kết quả chưa thẩm định thì chưa gắn người thẩm định.
@@ -24,5 +24,5 @@ Dựa trên quy trình nghiệp vụ của hệ thống, các mối quan hệ gi
 
 \texttt{EntryPhoto} có khóa riêng nên là thực thể mạnh, dù phụ thuộc tồn tại vào \texttt{Entry}. Ngược lại, \texttt{Frame} là thực thể yếu thật sự vì không có định danh riêng mà phải mượn khóa của \texttt{FilmRoll}, và quan hệ giữa hai bảng này là quan hệ định danh.
 
-Cách thể hiện trực quan của toàn bộ mô hình nằm ở Sơ đồ Lược đồ Logic (Hình 3.1) và Sơ đồ thiết kế Vật lý (Hình 4.1) tại các chương sau.
+Toàn bộ các mối quan hệ trên được thể hiện trên sơ đồ ERD ở mục tiếp theo (Hình~\ref{fig:erd}); lược đồ logic và sơ đồ thiết kế vật lý tương ứng nằm ở Hình 3.1 và Hình 4.1.
 
