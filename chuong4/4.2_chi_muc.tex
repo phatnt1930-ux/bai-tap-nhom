@@ -1,0 +1,28 @@
+\section{Chiến lược Đánh chỉ mục và Mã khởi tạo}
+
+Chỉ mục giảm chi phí đọc ở một số truy vấn nhưng làm tăng dung lượng và chi phí ghi. Vì vậy chỉ mục được chọn theo bộ lọc, phép nối và thứ tự kết quả của các truy vấn chính, không đặt tràn lan.
+
+\subsection{Chỉ mục triển khai}
+
+
+\begin{itemize}
+    \item Mọi khóa chính dùng chỉ mục gom cụm, là mặc định của SQL Server khi khai báo \texttt{PRIMARY KEY}. Ràng buộc \texttt{UNIQUE} tự sinh chỉ mục hỗ trợ khóa nghiệp vụ \texttt{Email} và \texttt{EntryCode}, nên không tạo thêm chỉ mục trùng chức năng.
+    \item SQL Server không tự tạo chỉ mục cho khóa ngoại. Trong 19 khóa ngoại, 7 khóa đã là cột đầu của khóa chính, của ràng buộc \texttt{UNIQUE} hoặc của chỉ mục ghép, ví dụ \texttt{FilmRollId} của \texttt{Frame} đứng đầu khóa chính (\texttt{FilmRollId}, \texttt{FrameNo}). Script chỉ tạo chỉ mục cho 12 khóa ngoại còn lại.
+    \item Chỉ mục ghép (\texttt{CategoryId}, \texttt{FinalScore} DESC) kèm \texttt{INCLUDE (EntryCode)} trên \texttt{Entry} hỗ trợ truy vấn xếp hạng theo hạng mục, phục vụ yêu cầu NF-1.
+    \item Chỉ mục trên \texttt{PerceptualHash} của \texttt{EntryPhoto} hỗ trợ dò ảnh trùng. Chỉ mục B-tree chỉ tăng tốc tìm khớp chính xác; tìm theo khoảng cách Hamming vẫn phải quét.
+    \item Ràng buộc duy nhất trên cặp (\texttt{PhotoAId}, \texttt{PhotoBId}) của \texttt{DuplicateMatch}, kết hợp với ràng buộc \texttt{CHECK (PhotoAId < PhotoBId)}, bảo đảm mỗi cặp chỉ lưu một lần theo BR-10.
+\end{itemize}
+
+
+\subsection{Đánh giá và giới hạn}
+
+Chưa tạo chỉ mục đơn trên các cột trạng thái vì miền giá trị nhỏ. Tuy nhiên miền giá trị nhỏ không có nghĩa chỉ mục luôn vô ích: chỉ mục ghép hoặc chỉ mục có điều kiện vẫn có thể hữu ích với tải công việc phù hợp. Các chỉ mục loại này chỉ được bổ sung khi kế hoạch thực thi, thống kê và chi phí ghi cho thấy lợi ích rõ ràng.
+
+Một giới hạn của hệ quản trị: SQL Server từ chối khai báo \texttt{CASCADE} cho cả hai khóa ngoại của \texttt{DuplicateMatch}, vì khi đó có hai đường xóa lan truyền cùng trỏ về \texttt{EntryPhoto}. Có thể để một khóa \texttt{CASCADE}, nhưng việc xóa ảnh khi đó sẽ bất đối xứng giữa vai trò ảnh thứ nhất và ảnh thứ hai, nên cả hai khóa được đặt \texttt{NO ACTION}. Hệ quả là muốn xóa một ảnh dự thi thì phải xóa các dòng \texttt{DuplicateMatch} liên quan trước.
+
+\subsection{Mã lệnh khởi tạo cơ sở dữ liệu (T-SQL)}
+
+Script dưới đây tạo 14 bảng theo đúng thứ tự phụ thuộc khóa ngoại, kèm toàn bộ ràng buộc và chỉ mục.
+
+\lstinputlisting[style=sqlstyle, caption={Script khởi tạo cơ sở dữ liệu trên SQL Server}]{sql/schema_sqlserver.sql}
+

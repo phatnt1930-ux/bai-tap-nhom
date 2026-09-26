@@ -1,0 +1,71 @@
+\section{Một số câu truy vấn mẫu}
+
+Dưới đây là các truy vấn T-SQL tiêu biểu dùng để kiểm chứng thiết kế cơ sở dữ liệu.
+
+\subsection{Bảng xếp hạng theo hạng mục}
+
+\begin{lstlisting}[style=sqlstyle]
+SELECT  e.EntryCode,
+        e.Title,
+        e.FinalScore,
+        RANK() OVER (PARTITION BY e.CategoryId
+                     ORDER BY e.FinalScore DESC) AS Rank
+FROM    Entry e
+JOIN    Category c ON c.CategoryId = e.CategoryId
+WHERE   c.CategoryName = N'Chan dung'
+  AND   e.Status IN ('Accepted', 'Awarded')
+ORDER BY e.CategoryId, Rank;
+\end{lstlisting}
+
+\subsection{Thống kê bài dự thi theo loại phim}
+
+Truy vấn này chứng minh giá trị của việc chuẩn hóa danh mục phim ở Chương 3: nếu tên phim được lưu dạng văn bản tự do thì kết quả đếm sẽ sai.
+
+\begin{lstlisting}[style=sqlstyle]
+SELECT  fs.Manufacturer,
+        fs.StockName,
+        fs.BoxSpeed,
+        COUNT(DISTINCT ep.EntryId)     AS SoBaiDuThi,
+        COUNT(ep.EntryPhotoId)         AS SoAnh
+FROM    EntryPhoto ep
+JOIN    Frame     f  ON f.FilmRollId = ep.FilmRollId
+                    AND f.FrameNo    = ep.FrameNo
+JOIN    FilmRoll  fr ON fr.FilmRollId = f.FilmRollId
+JOIN    FilmStock fs ON fs.FilmStockId = fr.FilmStockId
+GROUP BY fs.Manufacturer, fs.StockName, fs.BoxSpeed
+ORDER BY SoAnh DESC;
+\end{lstlisting}
+
+\subsection{Cảnh báo ảnh nghi trùng chưa thẩm định}
+
+Truy vấn thể hiện quan hệ đệ quy: bảng \texttt{DuplicateMatch} được nối hai lần về \texttt{EntryPhoto}.
+
+\begin{lstlisting}[style=sqlstyle]
+SELECT  dm.MatchId,
+        ea.EntryCode  AS BaiThuNhat,
+        eb.EntryCode  AS BaiThuHai,
+        dm.Similarity,
+        dm.DetectedAt
+FROM    DuplicateMatch dm
+JOIN    EntryPhoto pa ON pa.EntryPhotoId = dm.PhotoAId
+JOIN    EntryPhoto pb ON pb.EntryPhotoId = dm.PhotoBId
+JOIN    Entry      ea ON ea.EntryId = pa.EntryId
+JOIN    Entry      eb ON eb.EntryId = pb.EntryId
+WHERE   dm.ReviewStatus = 'Pending'
+ORDER BY dm.Similarity DESC;
+\end{lstlisting}
+
+\subsection{Tiến độ chấm của từng giám khảo}
+
+\begin{lstlisting}[style=sqlstyle]
+SELECT  u.FullName,
+        COUNT(*)                                             AS TongPhieu,
+        COUNT(CASE WHEN ss.Status = 'Locked' THEN 1 END)     AS DaChot,
+        CAST(100.0 * COUNT(CASE WHEN ss.Status = 'Locked' THEN 1 END)
+             / COUNT(*) AS DECIMAL(5,2))                     AS TyLePhanTram
+FROM    ScoreSheet ss
+JOIN    AppUser    u ON u.UserId = ss.JudgeUserId
+GROUP BY u.UserId, u.FullName
+ORDER BY TyLePhanTram;
+\end{lstlisting}
+

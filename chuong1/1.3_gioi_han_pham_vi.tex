@@ -1,0 +1,32 @@
+\section{Giới hạn phạm vi đồ án}
+
+\subsection{Phạm vi dữ liệu}
+
+Đồ án tập trung vào luồng nghiệp vụ chính, gồm hai nhóm dữ liệu cốt lõi: tổ chức cuộc thi và chấm điểm, và hồ sơ phim của bài dự thi. Các nhóm dữ liệu mở rộng dưới đây được xác định ở mức yêu cầu nhưng được giản lược khỏi mô hình quan niệm, lược đồ logic và mã DDL:
+
+
+\begin{itemize}
+    \item Hệ thống chỉ hỗ trợ một vòng chấm. Nhiều vòng cần thêm thực thể vòng thi và chuyển bốn cột kết quả sang một bảng kết quả vòng riêng.
+    \item Mỗi cuộn phim lưu một bằng chứng dưới dạng hai cột. Nhiều bằng chứng cần tách thành bảng riêng.
+    \item Gắn nhãn nội dung tự động nằm ngoài phạm vi. Nếu bổ sung, thêm một bảng trung gian giữa ảnh dự thi và nhãn.
+    \item Máy ảnh, ống kính và phòng lab lưu dạng văn bản. Nếu cần thống kê theo các chiều này thì tách thành bảng danh mục như đã làm với loại phim.
+    \item Thanh toán lệ phí, thông báo và nhật ký kiểm toán thuộc phạm vi mở rộng của hệ thống.
+\end{itemize}
+
+
+\subsection{Giới hạn về toàn vẹn và bảo mật}
+
+Khóa ngoại chỉ kiểm tra bản ghi được tham chiếu có tồn tại, không tự bảo đảm các ràng buộc liên bảng của nghiệp vụ. Những ràng buộc sau phải do trigger hoặc tầng dịch vụ đảm nhiệm và chưa nằm trong script khởi tạo:
+
+
+\begin{itemize}
+    \item Hạng mục của bài dự thi phải thuộc cùng cuộc thi với vai trò thí sinh của tác giả.
+    \item Tổng trọng số các tiêu chí của một cuộc thi phải bằng 100.
+    \item Giám khảo không được chấm bài của chính mình.
+    \item Cuộn phim chứa ảnh dự thi phải thuộc chính tác giả của bài.
+    \item Ngày chụp của khung hình không được sau ngày tráng của cuộn phim chứa nó.
+    \item Điểm theo từng tiêu chí không vượt quá thang điểm của tiêu chí đó.
+    \item Không được sửa điểm của phiếu chấm đã chốt.
+\end{itemize}
+
+

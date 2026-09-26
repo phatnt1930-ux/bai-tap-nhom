@@ -1,0 +1,54 @@
+\section{Phụ thuộc hàm và Khóa ứng viên}
+
+Để hệ thống không gặp dị thường dữ liệu khi thêm, xóa và sửa, cần phân tích tập phụ thuộc hàm rồi tiến hành chuẩn hóa.
+
+\subsection*{Xác định tập phụ thuộc hàm}
+
+Gọi $U$ là tập toàn bộ thuộc tính của hệ thống. Dựa trên các quy tắc nghiệp vụ, ta xác định tập phụ thuộc hàm $F$ cốt lõi. Để gọn, vế phải chỉ ghi các thuộc tính tiêu biểu; khóa chính của mỗi quan hệ được hiểu là xác định toàn bộ thuộc tính còn lại của quan hệ đó:
+
+{\footnotesize\begin{align}
+\texttt{UserId} &\rightarrow \texttt{Email, PasswordHash, FullName, Pseudonym, DateOfBirth} \\
+\texttt{Email} &\rightarrow \texttt{UserId, PasswordHash, FullName, Pseudonym} \label{eq:fd-email} \\
+\texttt{ContestId} &\rightarrow \texttt{ContestName, OrganizerName, SubmissionDeadline} \\
+\texttt{FilmStockId} &\rightarrow \texttt{StockName, Manufacturer, FilmType, BoxSpeed} \\
+\texttt{FilmRollId} &\rightarrow \texttt{OwnerUserId, FilmStockId, CameraModel, ExposureIndex} \label{eq:fd-roll} \\
+(\texttt{FilmRollId}, \texttt{FrameNo}) &\rightarrow \texttt{ShotOn, ShotLocation, LensNote} \label{eq:fd-frame} \\
+\texttt{EntryPhotoId} &\rightarrow \texttt{EntryId, FilmRollId, FrameNo, SequenceNo, ScanMethod} \\
+\texttt{EntryId} &\rightarrow \texttt{CategoryId, AuthorUserId, EntryCode, Status} \\
+\texttt{EntryCode} &\rightarrow \texttt{EntryId} \label{eq:fd-entrycode} \\
+\texttt{ScoreSheetId} &\rightarrow \texttt{EntryId, JudgeUserId, Status, Comment, LockedAt} \\
+(\texttt{ScoreSheetId}, \texttt{CriterionId}) &\rightarrow \texttt{Score}
+\end{align}}
+
+\subsection*{Giải thích nghiệp vụ}
+
+\begin{itemize}
+    \item Phụ thuộc \eqref{eq:fd-email}: email là khóa nghiệp vụ, duy nhất trên toàn hệ thống, nên cũng xác định được toàn bộ quan hệ \texttt{AppUser}.
+    \item Phụ thuộc \eqref{eq:fd-roll} và \eqref{eq:fd-frame} phản ánh BR-2 và BR-3: thông tin của cả cuộn phụ thuộc vào mã cuộn, còn thông tin của từng khung phụ thuộc vào cặp mã cuộn và số khung.
+    \item Phụ thuộc \eqref{eq:fd-entrycode} phản ánh BR-6: mã dự thi ẩn danh là duy nhất nên cũng là một khóa ứng viên của \texttt{Entry}.
+    \item Cặp (\texttt{Manufacturer}, \texttt{StockName}) của \texttt{FilmStock} được đặt ràng buộc duy nhất, nên cũng là một khóa ứng viên. Ngược lại, \texttt{CameraModel} và \texttt{LabName} là văn bản tự do và không được giả định duy nhất.
+\end{itemize}
+
+\subsection{Bao đóng và tính tối thiểu}
+
+Với \texttt{AppUser}, ta có hai tập đơn có bao đóng bằng toàn quan hệ:
+
+{\small\begin{align*}
+\{\texttt{UserId}\}^{+} &= R_{AppUser} \\
+\{\texttt{Email}\}^{+} &= R_{AppUser}
+\end{align*}}
+
+Không có phụ thuộc hàm nào từ tập rỗng, nên cả hai tập đơn đều tối thiểu và đều là khóa ứng viên. Chọn \texttt{UserId} làm khóa chính vì các bảng khác tham chiếu đến sẽ gọn hơn.
+
+Với \texttt{Frame}, xét tập $\{\texttt{FilmRollId}, \texttt{FrameNo}\}$:
+
+{\small\begin{align*}
+\{\texttt{FilmRollId}\}^{+} &\supseteq R_{FilmRoll}, \quad \texttt{ShotOn} \notin \{\texttt{FilmRollId}\}^{+} \\
+\{\texttt{FrameNo}\}^{+} &= \{\texttt{FrameNo}\} \\
+\{\texttt{FilmRollId}, \texttt{FrameNo}\}^{+} &\supseteq R_{Frame}
+\end{align*}}
+
+Bao đóng được lấy trên $U$ nên có thể chứa thêm thuộc tính của các quan hệ được tham chiếu, chẳng hạn thông tin loại phim của cuộn.
+
+Bỏ bất kỳ thuộc tính nào khỏi tập đều không còn xác định được toàn quan hệ, nên cặp là khóa ứng viên tối thiểu. Đây chính là biểu hiện của thực thể yếu ở mức quan niệm.
+

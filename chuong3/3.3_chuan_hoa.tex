@@ -1,0 +1,100 @@
+\section{Chuẩn hóa Dữ liệu}
+
+Một quan hệ đạt BCNF nếu mọi phụ thuộc hàm không tầm thường $X \rightarrow Y$ đều có $X$ là siêu khóa. Trong tập phụ thuộc đã xét, tất cả vế trái đều là khóa ứng viên của chính quan hệ đó, nên các quan hệ đều đáp ứng BCNF.
+
+Việc tách bốn cấp hồ sơ phim ở Chương 1 chính là điều giữ cho lược đồ đạt chuẩn. Nếu gộp toàn bộ vào một bảng, sẽ xuất hiện chuỗi phụ thuộc bắc cầu và lược đồ rơi xuống dưới 3NF.
+
+\subsection{Cách kiểm tra dạng chuẩn}
+
+1NF yêu cầu mỗi ô chứa một giá trị thuộc miền đã chọn, không chứa danh sách lặp. 2NF yêu cầu đạt 1NF và thuộc tính không khóa không phụ thuộc vào một phần thực sự của khóa ứng viên. 3NF yêu cầu với mỗi phụ thuộc hàm không tầm thường, vế trái là siêu khóa hoặc thuộc tính vế phải là thuộc tính khóa. BCNF yêu cầu vế trái luôn là siêu khóa.
+
+\subsection{Ví dụ vi phạm 3NF và cách phân rã}
+
+Cách thiết kế thường gặp nhất cho bài toán này là đặt toàn bộ thông số kỹ thuật vào một bảng quan hệ một--một với ảnh dự thi:
+
+
+\begin{lstlisting}[style=sqlstyle]
+FilmMetadataFlat (
+  EntryPhotoId, FilmRollId, FrameNo, CameraModel, LensNote,
+  FilmStockName, Manufacturer, FilmType, BoxSpeed, IsoUsed,
+  FilmFormat, LabName, ProcessType, ScannerModel,
+  DevelopedOn, ShotOn
+)
+\end{lstlisting}
+
+
+Lược đồ này đạt 1NF và 2NF vì khóa chỉ gồm một thuộc tính. Tuy nhiên nghiệp vụ cho biết một cuộn phim chứa nhiều khung: mọi khung trên cùng cuộn dùng chung loại phim, máy ảnh, phòng lab và quy trình tráng, còn ngày chụp và ống kính là thông tin của từng khung. Ta có các phụ thuộc:
+
+{\small\begin{align*}
+\texttt{EntryPhotoId} &\rightarrow \texttt{FilmRollId, FrameNo, ScannerModel} \\
+\texttt{FilmRollId} &\rightarrow \texttt{FilmStockName, CameraModel, IsoUsed, FilmFormat,} \\
+&\hphantom{{}\rightarrow{}} \texttt{LabName, ProcessType, DevelopedOn} \\
+(\texttt{FilmRollId}, \texttt{FrameNo}) &\rightarrow \texttt{ShotOn, LensNote} \\
+\texttt{FilmStockName} &\rightarrow \texttt{Manufacturer, FilmType, BoxSpeed}
+\end{align*}}
+
+Suy ra phụ thuộc bắc cầu:
+
+\[ \texttt{EntryPhotoId} \rightarrow \texttt{FilmRollId} \rightarrow \texttt{FilmStockName} \rightarrow \texttt{BoxSpeed} \]
+
+Các vế trái \texttt{FilmRollId}, (\texttt{FilmRollId}, \texttt{FrameNo}) và \texttt{FilmStockName} đều không phải siêu khóa, nên các thuộc tính không khóa như \texttt{CameraModel}, \texttt{ShotOn} và \texttt{BoxSpeed} phụ thuộc bắc cầu vào khóa. Lược đồ vi phạm 3NF.
+
+Ba dị thường phát sinh trong thực tế:
+
+
+\begin{itemize}
+    \item Dị thường khi sửa: một thí sinh nộp mười ảnh chụp cùng một cuộn thì mười dòng cùng lặp lại tên máy ảnh, tên phim và tên lab. Sửa một chỗ phải sửa cả mười.
+    \item Dị thường khi thêm: chưa thể ghi nhận một loại phim mới vào danh mục nếu chưa có ảnh nào dự thi bằng loại phim đó.
+    \item Dị thường khi xóa: xóa ảnh cuối cùng chụp bằng một loại phim làm mất luôn thông tin hãng sản xuất và ISO danh định của loại phim ấy.
+\end{itemize}
+
+
+Ngoài ba dị thường trên còn một hệ quả nghiêm trọng hơn về mặt nghiệp vụ: vì \texttt{FilmStockName} là văn bản tự do, ba chuỗi \textquotedblleft Kodak Portra 400\textquotedblright{}, \textquotedblleft Portra 400\textquotedblright{} và \textquotedblleft \mbox{Portra400}\textquotedblright{} bị đếm thành ba loại phim khác nhau, khiến báo cáo thống kê theo loại phim sai ngay từ đầu.
+
+Phân rã theo từng phụ thuộc hàm vi phạm, lấy vế trái làm khóa của lược đồ con, thu được bốn lược đồ con đạt BCNF:
+
+
+\begin{lstlisting}[style=sqlstyle]
+FilmStock  (FilmStockName, Manufacturer, FilmType, BoxSpeed)
+FilmRoll   (FilmRollId, FilmStockName, CameraModel, IsoUsed,
+            FilmFormat, LabName, ProcessType, DevelopedOn)
+Frame      (FilmRollId, FrameNo, ShotOn, LensNote)
+EntryPhoto (EntryPhotoId, FilmRollId, FrameNo, ScannerModel)
+\end{lstlisting}
+
+
+Mỗi lược đồ con chỉ còn phụ thuộc hàm có vế trái là khóa. Các lược đồ nối với nhau qua đúng vế trái của phụ thuộc đã tách, nên phép phân rã không mất thông tin và bảo toàn phụ thuộc hàm.
+
+Phép phân rã này còn mang lại hai lợi ích mà lược đồ gộp không có. Thứ nhất, thông tin của từng khung nằm ở thực thể yếu \texttt{Frame}, nên một khung được nộp ở nhiều cuộc thi vẫn chỉ có một bản ghi ngày chụp và ống kính. Thứ hai, lưu được bằng chứng ở mức cuộn phim, vì một dải phim hay một hóa đơn lab chứng minh cho cả cuộn chứ không cho riêng một ảnh.
+
+Khi chuyển sang lược đồ cuối cùng, \texttt{FilmStockName} được thay bằng khóa thay thế \texttt{FilmStockId}, và hai cột gộp được tách tiếp. \texttt{IsoUsed} tách thành \texttt{ExposureIndex} và \texttt{PushPullStops}: chụp phim ISO 400 ở EI 800 rồi tráng bình thường khác hẳn chụp ở EI 800 rồi push một stop, nhưng một cột \texttt{IsoUsed} cùng mang giá trị 800 không phân biệt được hai trường hợp. \texttt{ProcessType} tách thành quy trình chuẩn \texttt{StandardProcess} của loại phim và quy trình thực tế \texttt{ActualProcess} của cuộn, nhờ đó nhận ra được trường hợp tráng chéo.
+
+\subsection{Ví dụ vi phạm 2NF: vì sao phải tách phiếu chấm khỏi điểm tiêu chí}
+
+Trực giác ban đầu là gộp toàn bộ việc chấm vào một bảng duy nhất, mỗi dòng là điểm của một giám khảo cho một bài ở một tiêu chí:
+
+
+\begin{lstlisting}[style=sqlstyle]
+ScoreFlat (EntryId, JudgeUserId, CriterionId, Score, Comment, LockedAt)
+
+-- Khoa chinh: (EntryId, JudgeUserId, CriterionId)
+\end{lstlisting}
+
+
+Lược đồ này đạt 1NF. Nhưng nhận xét và thời điểm chốt phiếu là sự thật của cả phiếu chấm, không phải của từng tiêu chí. Ta có:
+
+\[ (\texttt{EntryId}, \texttt{JudgeUserId}) \rightarrow \texttt{Comment}, \texttt{LockedAt} \]
+
+Vế trái là một tập con thực sự của khóa chính, nên \texttt{Comment} và \texttt{LockedAt} phụ thuộc bộ phận vào khóa. Đó chính là định nghĩa vi phạm 2NF. Hậu quả trực tiếp: một phiếu chấm có năm tiêu chí thì nhận xét bị lặp năm lần, và chốt phiếu phải cập nhật năm dòng; nếu chỉ cập nhật được ba dòng thì phiếu rơi vào trạng thái nửa chốt nửa chưa.
+
+Phân rã theo đúng vế trái của phụ thuộc bộ phận thu được hai lược đồ đạt BCNF:
+
+
+\begin{lstlisting}[style=sqlstyle]
+ScoreSheet  (EntryId, JudgeUserId, Comment, LockedAt)
+ScoreDetail (EntryId, JudgeUserId, CriterionId, Score)
+\end{lstlisting}
+
+
+Như vậy việc tách hai bảng không phải lựa chọn cho gọn mà là hệ quả bắt buộc của 2NF. Ở lược đồ cuối cùng, \texttt{ScoreSheet} dùng khóa thay thế \texttt{ScoreSheetId}: cặp (\texttt{EntryId}, \texttt{JudgeUserId}) vẫn là khóa ứng viên và được bảo vệ bằng ràng buộc duy nhất, còn \texttt{ScoreDetail} tham chiếu một cột gọn hơn là hai. Cột \texttt{Status} được bổ sung để phân biệt phiếu nháp với phiếu đã chốt.
+

@@ -1,0 +1,36 @@
+\section{Chuyển đổi từ Mô hình Quan niệm sang Lược đồ Logic}
+
+\subsection{Các quy tắc chuyển đổi áp dụng}
+
+
+\begin{itemize}
+    \item Mỗi thực thể mạnh trở thành một quan hệ, khóa chính dùng định danh thay thế kiểu số nguyên tự tăng.
+    \item Thực thể yếu \texttt{Frame} nhận khóa chính ghép gồm khóa của cuộn phim và số khung trong phạm vi cuộn đó.
+    \item Mối quan hệ một--nhiều được hiện thực bằng khóa ngoại đặt ở phía nhiều.
+    \item Mối quan hệ nhiều--nhiều được tách thành bảng trung gian, mang theo thuộc tính riêng của mối quan hệ nếu có.
+    \item Quan hệ đệ quy nghi trùng được hiện thực bằng hai khóa ngoại cùng trỏ về \texttt{EntryPhoto}, kèm ràng buộc thứ tự để mỗi cặp chỉ lưu một lần.
+    \item Quan hệ nhiều--nhiều giữa \texttt{Entry} và giám khảo được phân rã qua \texttt{ScoreSheet}; quan hệ giữa \texttt{ScoreSheet} và \texttt{Criterion} được phân rã qua \texttt{ScoreDetail}.
+\end{itemize}
+
+
+\subsection{Danh sách Lược đồ Quan hệ sơ bộ}
+
+Áp dụng các quy tắc ánh xạ trên, ta thu được tập lược đồ quan hệ sơ bộ như sau. Quy ước: thuộc tính \underline{gạch chân} là khóa chính, thuộc tính \textit{in nghiêng} là khóa ngoại.
+
+\begin{itemize}\raggedright
+\item \texttt{AppUser}(\underline{UserId}, Email, PasswordHash, FullName, Pseudonym, DateOfBirth, IsLocked, IsAdmin)
+\item \texttt{Contest}(\underline{ContestId}, ContestName, OrganizerName, RegistrationOpenAt, SubmissionDeadline, JudgingDeadline, AnnouncementDate, Status)
+\item \texttt{ContestRole}(\underline{ContestRoleId}, \textit{UserId}, \textit{ContestId}, RoleType, RulesAcceptedAt)
+\item \texttt{Category}(\underline{CategoryId}, \textit{ContestId}, CategoryName, EntryFormat, MinPhotos, MaxPhotos, MaxEntriesPerUser)
+\item \texttt{Criterion}(\underline{CriterionId}, \textit{ContestId}, CriterionName, Weight, MaxScore)
+\item \texttt{FilmStock}(\underline{FilmStockId}, StockName, Manufacturer, FilmType, BoxSpeed, StandardProcess, IsVerified)
+\item \texttt{FilmRoll}(\underline{FilmRollId}, \textit{OwnerUserId}, \textit{FilmStockId}, FilmFormat, CameraModel, ExposureIndex, PushPullStops, DevelopedBy, LabName, ActualProcess, DevelopedOn, ProofImageUrl, ProofStatus)
+\item \texttt{Frame}(\textit{\underline{FilmRollId}}, \underline{FrameNo}, ShotOn, ShotLocation, LensNote)
+\item \texttt{Entry}(\underline{EntryId}, \textit{CategoryId}, \textit{AuthorUserId}, EntryCode, Title, Status, SubmittedAt, RejectReason, FinalScore, RankInCategory, PrizeName, FinalizedAt)
+\item \texttt{EntryPhoto}(\underline{EntryPhotoId}, \textit{EntryId}, \textit{FilmRollId}, \textit{FrameNo}, SequenceNo, ScanMethod, ScannerModel, EditLevel, FileUrl, PerceptualHash)
+\item \texttt{ScoreSheet}(\underline{ScoreSheetId}, \textit{EntryId}, \textit{JudgeUserId}, Status, Comment, LockedAt)
+\item \texttt{ScoreDetail}(\textit{\underline{ScoreSheetId}}, \textit{\underline{CriterionId}}, Score)
+\item \texttt{AiAnalysis}(\underline{AnalysisId}, \textit{EntryPhotoId}, ModelName, ModelVersion, AnalysisType, Confidence, Verdict, AnalyzedAt, ReviewVerdict, \textit{ReviewedByUserId})
+\item \texttt{DuplicateMatch}(\underline{MatchId}, \textit{PhotoAId}, \textit{PhotoBId}, Similarity, DetectedAt, ReviewStatus)
+\end{itemize}
+

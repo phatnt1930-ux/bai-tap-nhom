@@ -1,0 +1,28 @@
+\section{Xác định các mối quan hệ}
+
+Dựa trên quy trình nghiệp vụ của hệ thống, các mối quan hệ giữa các thực thể được xác định và phân tích bản số chi tiết như sau:
+
+
+\begin{itemize}
+    \item \texttt{Contest} -- Gồm -- \texttt{Category} (1-N): Một cuộc thi có nhiều hạng mục. Mỗi hạng mục chỉ thuộc một cuộc thi.
+    \item \texttt{Contest} -- Áp dụng -- \texttt{Criterion} (1-N): Một cuộc thi có nhiều tiêu chí chấm, tổng trọng số bằng 100.
+    \item \texttt{AppUser} -- Giữ vai trò -- \texttt{Contest} (N-N): Một người tham gia nhiều cuộc thi với các vai trò khác nhau. Phân rã thành \texttt{ContestRole}, mang theo loại vai trò và thời điểm đồng ý thể lệ.
+    \item \texttt{AppUser} -- Sở hữu -- \texttt{FilmRoll} (1-N): Một thí sinh sở hữu nhiều cuộn phim, dùng lại được cho nhiều cuộc thi.
+    \item \texttt{FilmStock} -- Được dùng cho -- \texttt{FilmRoll} (1-N): Một loại phim được nhiều cuộn sử dụng.
+    \item \texttt{FilmRoll} -- Chứa -- \texttt{Frame} (1-N, quan hệ định danh): Khung hình là thực thể yếu, không tồn tại độc lập và mượn khóa của cuộn phim.
+    \item \texttt{Frame} -- Được nộp thành -- \texttt{EntryPhoto} (1-N): Một khung hình có thể được nộp ở nhiều cuộc thi, mỗi lần là một ảnh dự thi riêng.
+    \item \texttt{Category} -- Nhận -- \texttt{Entry} (1-N): Một hạng mục nhận nhiều bài dự thi.
+    \item \texttt{AppUser} -- Sáng tác -- \texttt{Entry} (1-N): Một thí sinh nộp nhiều bài dự thi; mỗi bài có đúng một tác giả.
+    \item \texttt{Entry} -- Gồm -- \texttt{EntryPhoto} (1-N): Một bài gồm một ảnh nếu là ảnh đơn, nhiều ảnh nếu là bộ ảnh.
+    \item \texttt{Entry} -- Được chấm bởi -- \texttt{AppUser} (N-N): Phân rã thành \texttt{ScoreSheet}, mang theo trạng thái chốt và nhận xét.
+    \item \texttt{ScoreSheet} -- Chấm theo -- \texttt{Criterion} (N-N): Phân rã thành \texttt{ScoreDetail}, mang theo điểm số.
+    \item \texttt{EntryPhoto} -- Được phân tích -- \texttt{AiAnalysis} (1-N): Một ảnh được phân tích nhiều lần, kết quả cũ không bị ghi đè.
+    \item \texttt{AppUser} -- Thẩm định -- \texttt{AiAnalysis} (1-N, không bắt buộc): Một thành viên ban tổ chức thẩm định nhiều kết quả phân tích; kết quả chưa thẩm định thì chưa gắn người thẩm định.
+    \item \texttt{EntryPhoto} -- Nghi trùng -- \texttt{EntryPhoto} (N-N, đệ quy): Hai ảnh tạo thành một cặp. Phân rã thành \texttt{DuplicateMatch} với hai khóa ngoại cùng trỏ về ảnh dự thi.
+\end{itemize}
+
+
+\texttt{EntryPhoto} có khóa riêng nên là thực thể mạnh, dù phụ thuộc tồn tại vào \texttt{Entry}. Ngược lại, \texttt{Frame} là thực thể yếu thật sự vì không có định danh riêng mà phải mượn khóa của \texttt{FilmRoll}, và quan hệ giữa hai bảng này là quan hệ định danh.
+
+Cách thể hiện trực quan của toàn bộ mô hình nằm ở Sơ đồ Lược đồ Logic (Hình 3.1) và Sơ đồ thiết kế Vật lý (Hình 4.1) tại các chương sau.
+

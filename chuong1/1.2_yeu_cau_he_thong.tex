@@ -1,0 +1,51 @@
+\section{Đối tượng sử dụng và Yêu cầu hệ thống}
+
+\subsection{Yêu cầu chức năng}
+
+Hệ thống phục vụ bốn nhóm tác nhân. Bảng dưới đây liệt kê các yêu cầu chức năng có tác động tới dữ liệu, ký hiệu FR-DB.
+
+
+\begin{longtable}{|c|p{2.6cm}|p{8.6cm}|}
+\caption{Yêu cầu chức năng theo tác nhân} \\
+\hline
+\textbf{Mã} & \textbf{Tác nhân} & \textbf{Yêu cầu chức năng} \\ \hline
+\endfirsthead
+\hline
+\textbf{Mã} & \textbf{Tác nhân} & \textbf{Yêu cầu chức năng} \\ \hline
+\endhead
+FR-DB-01 & Quản trị viên & Quản lý tài khoản, khóa và mở khóa, gán vai trò theo từng cuộc thi \\ \hline
+FR-DB-02 & Quản trị viên & Quản lý danh mục loại phim và duyệt các mục do thí sinh đề xuất \\ \hline
+FR-DB-03 & Quản trị viên & Tra cứu kết quả phân tích và lịch sử thẩm định \\ \hline
+FR-DB-04 & Ban tổ chức & Tạo cuộc thi, cấu hình hạng mục và bộ tiêu chí chấm \\ \hline
+FR-DB-05 & Ban tổ chức & Sơ loại bài dự thi và thẩm định cảnh báo của hệ thống phân tích \\ \hline
+FR-DB-06 & Ban tổ chức & Phân công giám khảo bằng cách tạo sẵn phiếu chấm rỗng \\ \hline
+FR-DB-07 & Ban tổ chức & Chốt kết quả, công bố và ghi nhận giải thưởng \\ \hline
+FR-DB-08 & Giám khảo & Xem danh sách bài được phân công dưới dạng ẩn danh \\ \hline
+FR-DB-09 & Giám khảo & Chấm điểm theo từng tiêu chí, lưu nháp và chốt phiếu \\ \hline
+FR-DB-10 & Thí sinh & Đăng ký dự thi và khai báo cuộn phim, khung hình, bằng chứng \\ \hline
+FR-DB-11 & Thí sinh & Nộp bài dự thi, tải tệp scan và theo dõi kết quả \\ \hline
+FR-DB-12 & Hệ thống & Tính mã băm khi tải ảnh, gọi dịch vụ phân tích và lưu kết quả kèm phiên bản mô hình \\ \hline
+\end{longtable}
+
+
+\subsection{Yêu cầu phi chức năng và tác động đến thiết kế}
+
+Mỗi yêu cầu phi chức năng đều để lại dấu vết cụ thể trên lược đồ. Bảng dưới đây ghi kèm tác động của từng yêu cầu đến thiết kế.
+
+
+\begin{longtable}{|c|p{2.4cm}|p{8.8cm}|}
+\caption{Yêu cầu phi chức năng và tác động đến thiết kế} \\
+\hline
+\textbf{Mã} & \textbf{Nhóm} & \textbf{Nội dung và tác động đến thiết kế} \\ \hline
+\endfirsthead
+\hline
+\textbf{Mã} & \textbf{Nhóm} & \textbf{Nội dung và tác động đến thiết kế} \\ \hline
+\endhead
+NF-1 & Hiệu năng & Truy vấn xếp hạng một hạng mục trả về dưới 200 ms với 10.000 bài. Quyết định chiến lược đánh chỉ mục ở Chương 4. \\ \hline
+NF-2 & Bảo mật & Chấm ẩn danh. Buộc tách mã dự thi khỏi danh tính thí sinh. \\ \hline
+NF-3 & Toàn vẹn & Phiếu đã chốt và kết quả đã công bố là bất biến. Sinh ra cột trạng thái trên phiếu chấm và bốn cột kết quả chốt trên bài dự thi. \\ \hline
+NF-4 & Truy vết & Kết quả phân tích lưu kèm tên và phiên bản mô hình, không ghi đè kết quả cũ. \\ \hline
+NF-5 & Chính xác số & Điểm số không được sai lệch làm tròn. Dùng DECIMAL thay vì FLOAT. \\ \hline
+\end{longtable}
+
+

@@ -1,0 +1,43 @@
+\section{Quy tắc nghiệp vụ trọng yếu và Ánh xạ dữ liệu}
+
+\subsection{Các quy tắc nghiệp vụ}
+
+Các quy tắc dưới đây tác động trực tiếp tới việc xác định thực thể, bản số mối quan hệ và ràng buộc toàn vẹn.
+
+\begin{description}
+    \item[BR-1. Ràng buộc vai trò theo phạm vi:] Một người dùng giữ được nhiều vai trò cùng lúc và ở các cuộc thi khác nhau. Vai trò trong cuộc thi vì vậy không phải thuộc tính của bảng người dùng mà là một thực thể riêng gắn với cặp người dùng và cuộc thi. Riêng quyền quản trị viên áp dụng cho toàn hệ thống, không gắn với cuộc thi nào, nên được lưu bằng một cờ trên bảng người dùng.
+    \item[BR-2. Ràng buộc bốn cấp hồ sơ phim:] Thông tin kỹ thuật được khai ở đúng cấp mà nó thuộc về. Loại phim, khổ phim, máy ảnh và quy trình tráng thuộc về cuộn phim; ngày chụp, địa điểm và ống kính thuộc về từng khung hình; phương pháp scan và mức hậu kỳ thuộc về ảnh dự thi.
+    \item[BR-3. Ràng buộc thực thể yếu Khung hình:] Khung hình được nhận diện bằng số khung trong phạm vi một cuộn phim. Hai cuộn khác nhau đều có thể có khung số 12, nên khóa chính của khung hình là khóa ghép gồm mã cuộn phim và số khung.
+    \item[BR-4. Ràng buộc độ nhạy:] Độ nhạy danh định thuộc loại phim, còn độ nhạy đặt khi chụp và mức push hoặc pull thuộc cuộn phim. Ba giá trị này không suy ra được từ nhau nên phải lưu tách biệt.
+    \item[BR-5. Ràng buộc miền giá trị:] Trọng số tiêu chí phải là số thực dương; điểm chấm phải nằm trong thang điểm của tiêu chí; điểm tin cậy của mô hình phân tích nằm trong đoạn từ 0 đến 1; mọi cột trạng thái đều bị giới hạn bằng ràng buộc CHECK với tập giá trị liệt kê tường minh.
+    \item[BR-6. Ràng buộc chấm ẩn danh:] Khi chấm, giám khảo chỉ thấy mã dự thi, ảnh, hồ sơ phim và bằng chứng. Mã dự thi là duy nhất và không chứa thông tin nhận diện thí sinh.
+    \item[BR-7. Ràng buộc phiếu chấm duy nhất:] Mỗi giám khảo có tối đa một phiếu chấm cho một bài. Phiếu đã chốt không được sửa.
+    \item[BR-8. Ràng buộc bất biến kết quả:] Điểm và thứ hạng được chốt tại thời điểm công bố, không thay đổi khi dữ liệu gốc thay đổi về sau.
+    \item[BR-9. Ràng buộc truy vết phân tích:] Mỗi lần phân tích lưu kèm tên và phiên bản mô hình đã sinh ra kết quả, và không ghi đè kết quả cũ. Cảnh báo không tự động loại bài; kết luận cuối cùng do ban tổ chức đưa ra.
+    \item[BR-10. Ràng buộc cặp ảnh nghi trùng:] Quan hệ nghi trùng là quan hệ đệ quy trên ảnh dự thi. Mỗi cặp chỉ được ghi một lần và không ghép một ảnh với chính nó, hiện thực bằng ràng buộc thứ tự giữa hai khóa ngoại.
+\end{description}
+
+\subsection{Ánh xạ Yêu cầu vào Đối tượng Dữ liệu chính}
+
+Bảng dưới đây tổng hợp ánh xạ từ nhóm yêu cầu sang các thực thể cốt lõi. Kết quả này là đầu vào trực tiếp cho Chương 2.
+
+
+\begin{longtable}{|p{3.2cm}|L{2.4cm}|p{8.2cm}|}
+\caption{Ánh xạ yêu cầu và nhóm dữ liệu vào thực thể} \\
+\hline
+\textbf{Nhóm dữ liệu} & \textbf{Mã yêu cầu} & \textbf{Thực thể quản lý và vai trò} \\ \hline
+\endfirsthead
+\hline
+\textbf{Nhóm dữ liệu} & \textbf{Mã yêu cầu} & \textbf{Thực thể quản lý và vai trò} \\ \hline
+\endhead
+Tổ chức và phân quyền & FR-DB-01 & \texttt{AppUser}, \texttt{ContestRole}: định danh người dùng, cờ quản trị viên toàn hệ thống và vai trò theo phạm vi từng cuộc thi. Dòng vai trò thí sinh đồng thời là đăng ký dự thi. \\ \hline
+Cấu hình cuộc thi & FR-DB-04 & \texttt{Contest}, \texttt{Category}, \texttt{Criterion}: thể lệ, lịch trình, hạng mục và bộ tiêu chí chấm. \\ \hline
+Danh mục phim & FR-DB-02 & \texttt{FilmStock}: danh mục loại phim dùng chung, có cơ chế chờ duyệt, phục vụ thống kê theo loại phim. \\ \hline
+Hồ sơ phim & FR-DB-10 & \texttt{FilmRoll}, \texttt{Frame}: hồ sơ phim và bằng chứng chứng minh ảnh chụp trên phim thật. \\ \hline
+Bài dự thi & FR-DB-11, 05 & \texttt{Entry}, \texttt{EntryPhoto}: đơn vị được chấm và các ảnh thành phần; trạng thái và lý do loại phục vụ sơ loại. \\ \hline
+Chấm thi & FR-DB-06, 08, 09 & \texttt{ScoreSheet}, \texttt{ScoreDetail}: phiếu chấm và điểm theo từng tiêu chí. \\ \hline
+Kết quả & FR-DB-07 & Bốn cột kết quả trên \texttt{Entry}: điểm tổng, thứ hạng, giải thưởng và thời điểm chốt. \\ \hline
+Phân tích AI & FR-DB-12, 03, 05 & \texttt{AiAnalysis}, \texttt{DuplicateMatch}: kết quả phân tích kèm phiên bản mô hình, các cặp ảnh nghi trùng và kết luận thẩm định của ban tổ chức. \\ \hline
+\end{longtable}
+
+

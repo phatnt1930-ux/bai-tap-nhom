@@ -1,8 +1,6 @@
 \documentclass[12pt,a4paper]{report}
 
-% --- Hỗ trợ tiếng Việt cho cả hai trình biên dịch ---
-% XeLaTeX / LuaLaTeX: dùng font Unicode, chạy được ở mọi nơi.
-% pdfLaTeX: dùng bảng mã T5, cần cài gói vntex.
+% Tiếng Việt: pdfLaTeX dùng bảng mã T5 (gói vntex), XeLaTeX/LuaLaTeX dùng fontspec
 \usepackage{iftex}
 \ifPDFTeX
     \usepackage[utf8]{inputenc}
@@ -18,14 +16,15 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{geometry}
 \usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \usepackage{tabularx}
 \usepackage{longtable}
 \usepackage{amsmath}
+\allowdisplaybreaks
 \geometry{a4paper, margin=1in}
+\setlength{\emergencystretch}{2em}
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning, automata}
 
 \lstdefinestyle{sqlstyle}{
     language=SQL,
@@ -73,7 +72,7 @@
     \large
     \textbf{Nhóm sinh viên thực hiện:}\\[0.5cm]
     \renewcommand{\arraystretch}{1.3}
-    \setlength{\tabcolsep}{15pt} % Tự động căn chỉnh khoảng cách giữa các cột rộng rãi, đều đặn
+    \setlength{\tabcolsep}{15pt}
     \begin{tabular}{|c|l|c|}
         \hline
         \textbf{STT} & \textbf{Họ và tên} & \textbf{MSSV} \\ \hline

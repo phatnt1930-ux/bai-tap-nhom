@@ -1,0 +1,417 @@
+\section{Từ điển Dữ liệu}
+
+Từ điển dữ liệu mô tả chi tiết cấu trúc các bảng: tên thuộc tính, kiểu dữ liệu, ràng buộc toàn vẹn và diễn giải ý nghĩa của từng trường, chuẩn bị cho bước triển khai vật lý ở Chương 4.
+
+\subsection{Bảng \texttt{AppUser} (Người dùng)}
+
+Tài khoản dùng chung cho cả bốn nhóm tác nhân. Đặt tên AppUser vì User là từ khóa của SQL Server.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng AppUser} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{UserId} & \texttt{INT} & PK, IDENTITY & Mã định danh người dùng. \\ \hline
+\texttt{Email} & \texttt{VARCHAR(255)} & NOT NULL, UNIQUE & Khóa nghiệp vụ dùng để đăng nhập. \\ \hline
+\texttt{PasswordHash} & \texttt{VARCHAR(255)} & NOT NULL & Mã băm mật khẩu. \\ \hline
+\texttt{FullName} & \texttt{NVARCHAR(150)} & NOT NULL & Họ tên thật. \\ \hline
+\texttt{Pseudonym} & \texttt{NVARCHAR(100)} & NULL & Bút danh hiển thị khi công bố kết quả. \\ \hline
+\texttt{DateOfBirth} & \texttt{DATE} & NULL & Ngày sinh, dùng để tính tuổi tại hạn nộp bài. \\ \hline
+\texttt{IsLocked} & \texttt{BIT} & NOT NULL, DEFAULT 0 & Tài khoản bị khóa thì không thao tác được. \\ \hline
+\texttt{IsAdmin} & \texttt{BIT} & NOT NULL, DEFAULT 0 & Quản trị viên hệ thống, quyền áp dụng toàn hệ thống (BR-1). \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item Chính sách xóa: không xóa vật lý tài khoản mà khóa bằng cờ IsLocked và ẩn danh hóa; quy tắc này do tầng dịch vụ thực hiện
+\end{itemize}
+
+\subsection{Bảng \texttt{Contest} (Cuộc thi)}
+
+Một đợt thi có thể lệ, lịch trình và đơn vị tổ chức riêng.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng Contest} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{ContestId} & \texttt{INT} & PK, IDENTITY & Mã định danh cuộc thi. \\ \hline
+\texttt{ContestName} & \texttt{NVARCHAR(200)} & NOT NULL & Tên cuộc thi. \\ \hline
+\texttt{OrganizerName} & \texttt{NVARCHAR(200)} & NOT NULL & Đơn vị đứng tên tổ chức. \\ \hline
+\texttt{RegistrationOpenAt} & \texttt{DATE} & NOT NULL & Ngày mở đăng ký. \\ \hline
+\texttt{SubmissionDeadline} & \texttt{DATE} & NOT NULL & Hạn nộp bài, phải sau ngày mở đăng ký. \\ \hline
+\texttt{JudgingDeadline} & \texttt{DATE} & NOT NULL & Hạn chấm, phải sau hạn nộp bài. \\ \hline
+\texttt{AnnouncementDate} & \texttt{DATE} & NULL & Ngày công bố kết quả. \\ \hline
+\texttt{Status} & \texttt{VARCHAR(20)} & NOT NULL & Draft, Open, Judging, Announced. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (SubmissionDeadline > RegistrationOpenAt)
+    \item CHECK (JudgingDeadline > SubmissionDeadline)
+    \item CHECK (Status IN ('Draft',\allowbreak{}'Open',\allowbreak{}'Judging',\allowbreak{}'Announced'))
+\end{itemize}
+
+\subsection{Bảng \texttt{ContestRole} (Vai trò theo cuộc thi)}
+
+Gán vai trò cho người dùng trong phạm vi một cuộc thi. Đây là lý do vai trò trong cuộc thi không phải một cột trên AppUser (BR-1). Dòng vai trò Contestant đồng thời là đăng ký dự thi, dòng vai trò Judge đồng thời là phân công giám khảo cho cuộc thi.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng ContestRole} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{ContestRoleId} & \texttt{INT} & PK, IDENTITY & Mã định danh bản ghi phân vai. \\ \hline
+\texttt{UserId} & \texttt{INT} & FK, NOT NULL & Người dùng được gán vai trò. \\ \hline
+\texttt{ContestId} & \texttt{INT} & FK, NOT NULL & Cuộc thi mà vai trò có hiệu lực. \\ \hline
+\texttt{RoleType} & \texttt{VARCHAR(20)} & NOT NULL & Organizer, Judge hoặc Contestant. \\ \hline
+\texttt{RulesAcceptedAt} & \texttt{DATETIME} & NULL & Thời điểm đồng ý thể lệ, chỉ dùng cho thí sinh. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item UNIQUE (UserId,\allowbreak{} ContestId,\allowbreak{} RoleType)
+    \item CHECK (RoleType IN ('Organizer',\allowbreak{}'Judge',\allowbreak{}'Contestant'))
+    \item ON DELETE: UserId CASCADE,\allowbreak{} ContestId CASCADE
+\end{itemize}
+
+\subsection{Bảng \texttt{Category} (Hạng mục)}
+
+Nhóm đề tài trong cuộc thi, quy định hình thức bài và số ảnh cho phép.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng Category} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{CategoryId} & \texttt{INT} & PK, IDENTITY & Mã định danh hạng mục. \\ \hline
+\texttt{ContestId} & \texttt{INT} & FK, NOT NULL & Cuộc thi chứa hạng mục. \\ \hline
+\texttt{CategoryName} & \texttt{NVARCHAR(120)} & NOT NULL & Tên hạng mục, ví dụ Chân dung. \\ \hline
+\texttt{EntryFormat} & \texttt{VARCHAR(10)} & NOT NULL & Single là ảnh đơn, Series là bộ ảnh. \\ \hline
+\texttt{MinPhotos} & \texttt{INT} & NOT NULL & Số ảnh tối thiểu của một bài. \\ \hline
+\texttt{MaxPhotos} & \texttt{INT} & NOT NULL & Số ảnh tối đa, không nhỏ hơn MinPhotos. \\ \hline
+\texttt{MaxEntriesPerUser} & \texttt{INT} & NOT NULL & Số bài tối đa một thí sinh được nộp. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (EntryFormat IN ('Single',\allowbreak{}'Series'))
+    \item CHECK (MinPhotos >= 1 AND MaxPhotos >= MinPhotos)
+    \item ON DELETE: ContestId CASCADE
+\end{itemize}
+
+\subsection{Bảng \texttt{Criterion} (Tiêu chí chấm)}
+
+Một khía cạnh chấm của cuộc thi, có trọng số và thang điểm riêng. Tổng trọng số các tiêu chí của một cuộc thi bằng 100.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng Criterion} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{CriterionId} & \texttt{INT} & PK, IDENTITY & Mã định danh tiêu chí. \\ \hline
+\texttt{ContestId} & \texttt{INT} & FK, NOT NULL & Cuộc thi áp dụng tiêu chí. \\ \hline
+\texttt{CriterionName} & \texttt{NVARCHAR(120)} & NOT NULL & Tên tiêu chí, ví dụ Bố cục. \\ \hline
+\texttt{Weight} & \texttt{DECIMAL(5,2)} & NOT NULL & Trọng số tính theo phần trăm. \\ \hline
+\texttt{MaxScore} & \texttt{DECIMAL(5,2)} & NOT NULL & Thang điểm tối đa của tiêu chí. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (Weight > 0 AND MaxScore > 0)
+    \item ON DELETE: ContestId CASCADE
+\end{itemize}
+
+\subsection{Bảng \texttt{FilmStock} (Loại phim)}
+
+Danh mục sản phẩm phim của hãng, ví dụ Kodak Portra 400. Là bảng tham chiếu giúp thống kê theo loại phim; thí sinh đề xuất mục mới và quản trị viên duyệt.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng FilmStock} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{FilmStockId} & \texttt{INT} & PK, IDENTITY & Mã định danh loại phim. \\ \hline
+\texttt{StockName} & \texttt{NVARCHAR(120)} & NOT NULL & Tên thương mại của phim. \\ \hline
+\texttt{Manufacturer} & \texttt{NVARCHAR(80)} & NOT NULL & Hãng sản xuất. \\ \hline
+\texttt{FilmType} & \texttt{VARCHAR(20)} & NOT NULL & ColorNegative, Slide hoặc BlackWhite. \\ \hline
+\texttt{BoxSpeed} & \texttt{INT} & NOT NULL & ISO danh định, thuộc loại phim chứ không thuộc cuộn (BR-4). \\ \hline
+\texttt{StandardProcess} & \texttt{VARCHAR(20)} & NOT NULL & Quy trình tráng chuẩn: C-41, E-6, ECN-2, BW. \\ \hline
+\texttt{IsVerified} & \texttt{BIT} & NOT NULL, DEFAULT 0 & Đã được quản trị viên duyệt hay còn chờ duyệt. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item UNIQUE (Manufacturer,\allowbreak{} StockName)
+    \item CHECK (FilmType IN ('ColorNegative',\allowbreak{}'Slide',\allowbreak{}'BlackWhite'))
+    \item CHECK (BoxSpeed > 0)
+\end{itemize}
+
+\subsection{Bảng \texttt{FilmRoll} (Cuộn phim)}
+
+Một cuộn phim cụ thể thí sinh đã chụp và tráng. Mọi thông tin ở đây khai một lần, dùng chung cho toàn bộ khung trên cuộn. Hai cột cuối lưu bằng chứng chụp trên phim thật.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng FilmRoll} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{FilmRollId} & \texttt{INT} & PK, IDENTITY & Mã định danh cuộn phim. \\ \hline
+\texttt{OwnerUserId} & \texttt{INT} & FK, NOT NULL & Thí sinh sở hữu cuộn. \\ \hline
+\texttt{FilmStockId} & \texttt{INT} & FK, NOT NULL & Loại phim đã dùng (BR-2). \\ \hline
+\texttt{FilmFormat} & \texttt{VARCHAR(20)} & NOT NULL & Khổ phim: 35mm, 120 hoặc 4x5. \\ \hline
+\texttt{CameraModel} & \texttt{NVARCHAR(120)} & NOT NULL & Máy ảnh dùng cho cả cuộn (BR-2). \\ \hline
+\texttt{ExposureIndex} & \texttt{INT} & NOT NULL & Độ nhạy đặt khi chụp, khác ISO danh định (BR-4). \\ \hline
+\texttt{PushPullStops} & \texttt{SMALLINT} & NOT NULL, DEFAULT 0 & Mức push dương hoặc pull âm, tính bằng stop (BR-4). \\ \hline
+\texttt{DevelopedBy} & \texttt{VARCHAR(10)} & NOT NULL & Lab hoặc Self; Self là lựa chọn riêng, không để trống. \\ \hline
+\texttt{LabName} & \texttt{NVARCHAR(150)} & NULL & Tên phòng lab; rỗng khi tự tráng. \\ \hline
+\texttt{ActualProcess} & \texttt{VARCHAR(20)} & NOT NULL & Quy trình tráng thực tế; khác chuẩn nghĩa là tráng chéo. \\ \hline
+\texttt{DevelopedOn} & \texttt{DATE} & NULL & Ngày tráng; không được trước ngày chụp. \\ \hline
+\texttt{ProofImageUrl} & \texttt{VARCHAR(500)} & NULL & Ảnh dải phim hoặc hóa đơn lab chứng minh cuộn có thật. \\ \hline
+\texttt{ProofStatus} & \texttt{VARCHAR(20)} & NOT NULL & Pending, Verified hoặc Rejected. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (DevelopedBy IN ('Lab',\allowbreak{}'Self'))
+    \item CHECK (DevelopedBy = 'Self' OR LabName IS NOT NULL)
+    \item CHECK (ExposureIndex > 0 AND PushPullStops BETWEEN -3 AND 3)
+    \item CHECK (ProofStatus IN ('Pending',\allowbreak{}'Verified',\allowbreak{}'Rejected'))
+    \item ON DELETE: OwnerUserId RESTRICT,\allowbreak{} FilmStockId RESTRICT
+\end{itemize}
+
+\subsection{Bảng \texttt{Frame} (Khung hình)}
+
+Thực thể yếu: một khung trên cuộn phim, định danh bằng số khung trong phạm vi cuộn (BR-3).
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng Frame} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{FilmRollId} & \texttt{INT} & PK, FK & Phần khóa mượn từ cuộn phim. \\ \hline
+\texttt{FrameNo} & \texttt{VARCHAR(5)} & PK & Số khung in ở mép phim, ví dụ 12 hoặc 12A. \\ \hline
+\texttt{ShotOn} & \texttt{DATE} & NULL & Ngày chụp; không được sau ngày tráng. \\ \hline
+\texttt{ShotLocation} & \texttt{NVARCHAR(200)} & NULL & Địa điểm chụp. \\ \hline
+\texttt{LensNote} & \texttt{NVARCHAR(120)} & NULL & Ống kính dùng cho khung này; thay đổi theo từng khung. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item ON DELETE: FilmRollId CASCADE (quan hệ định danh của thực thể yếu)
+\end{itemize}
+
+\subsection{Bảng \texttt{Entry} (Bài dự thi)}
+
+Đơn vị được chấm: một ảnh đơn hoặc một bộ ảnh. Bốn cột cuối lưu kết quả chốt tại thời điểm công bố, không đổi khi tính lại về sau (BR-8).
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng Entry} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{EntryId} & \texttt{INT} & PK, IDENTITY & Mã định danh nội bộ của bài dự thi. \\ \hline
+\texttt{CategoryId} & \texttt{INT} & FK, NOT NULL & Hạng mục dự thi. \\ \hline
+\texttt{AuthorUserId} & \texttt{INT} & FK, NOT NULL & Tác giả bài dự thi. \\ \hline
+\texttt{EntryCode} & \texttt{VARCHAR(20)} & NOT NULL, UNIQUE & Mã ẩn danh giám khảo nhìn thấy (BR-6). \\ \hline
+\texttt{Title} & \texttt{NVARCHAR(200)} & NOT NULL & Tên bài dự thi. \\ \hline
+\texttt{Status} & \texttt{VARCHAR(20)} & NOT NULL & Draft, Submitted, NeedsInfo, Accepted, Awarded, Rejected, Withdrawn (BR-5). \\ \hline
+\texttt{SubmittedAt} & \texttt{DATETIME} & NULL & Thời điểm nộp; rỗng khi còn là bản nháp. \\ \hline
+\texttt{RejectReason} & \texttt{NVARCHAR(500)} & NULL & Lý do bị loại, bắt buộc khi Status là Rejected. \\ \hline
+\texttt{FinalScore} & \texttt{DECIMAL(6,3)} & NULL & Điểm tổng chốt lúc công bố (BR-8). \\ \hline
+\texttt{RankInCategory} & \texttt{INT} & NULL & Thứ hạng trong hạng mục. \\ \hline
+\texttt{PrizeName} & \texttt{NVARCHAR(120)} & NULL & Giải đạt được; rỗng nếu không đoạt giải. \\ \hline
+\texttt{FinalizedAt} & \texttt{DATETIME} & NULL & Thời điểm chốt kết quả; sau mốc này điểm không đổi. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (Status IN ('Draft',\allowbreak{}'Submitted',\allowbreak{}'NeedsInfo',\allowbreak{}'Accepted',\allowbreak{}'Awarded',\allowbreak{}'Rejected',\allowbreak{}'Withdrawn'))
+    \item CHECK (Status <> 'Rejected' OR RejectReason IS NOT NULL)
+    \item ON DELETE: CategoryId RESTRICT,\allowbreak{} AuthorUserId RESTRICT
+\end{itemize}
+
+\subsection{Bảng \texttt{EntryPhoto} (Ảnh dự thi)}
+
+Một khung hình được nộp trong một bài dự thi, kèm tệp scan và mức hậu kỳ của lần nộp đó. Đây là điểm nối giữa hồ sơ phim và cuộc thi.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng EntryPhoto} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{EntryPhotoId} & \texttt{INT} & PK, IDENTITY & Mã định danh ảnh dự thi. \\ \hline
+\texttt{EntryId} & \texttt{INT} & FK, NOT NULL & Bài dự thi chứa ảnh. \\ \hline
+\texttt{FilmRollId} & \texttt{INT} & FK, NOT NULL & Phần khóa ngoại trỏ về khung hình gốc. \\ \hline
+\texttt{FrameNo} & \texttt{VARCHAR(5)} & FK, NOT NULL & Phần còn lại của khóa ngoại trỏ về khung hình (BR-3). \\ \hline
+\texttt{SequenceNo} & \texttt{INT} & NOT NULL & Thứ tự ảnh trong bộ, không trùng trong cùng bài. \\ \hline
+\texttt{ScanMethod} & \texttt{VARCHAR(30)} & NOT NULL & FilmScanner, FlatbedScanner, DslrScan hoặc LabScan (BR-2). \\ \hline
+\texttt{ScannerModel} & \texttt{NVARCHAR(120)} & NULL & Mẫu máy scan, ví dụ Frontier SP3000. \\ \hline
+\texttt{EditLevel} & \texttt{VARCHAR(20)} & NOT NULL & None hoặc BasicOnly; cấm ghép ảnh (BR-2). \\ \hline
+\texttt{FileUrl} & \texttt{VARCHAR(500)} & NOT NULL & Đường dẫn tệp scan gốc. \\ \hline
+\texttt{PerceptualHash} & \texttt{BIGINT} & NULL & Mã băm cảm nhận, phát hiện ảnh giống sau chỉnh sửa. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item UNIQUE (EntryId,\allowbreak{} SequenceNo)
+    \item FOREIGN KEY (FilmRollId,\allowbreak{} FrameNo) REFERENCES Frame (FilmRollId,\allowbreak{} FrameNo)
+    \item CHECK (EditLevel IN ('None',\allowbreak{}'BasicOnly'))
+    \item ON DELETE: EntryId CASCADE,\allowbreak{} Frame RESTRICT
+\end{itemize}
+
+\subsection{Bảng \texttt{ScoreSheet} (Phiếu chấm)}
+
+Phiếu chấm của một giám khảo cho một bài; mỗi giám khảo có tối đa một phiếu cho một bài (BR-7). Ban tổ chức tạo sẵn phiếu rỗng, nên chính việc tồn tại một dòng ở đây là sự phân công chấm bài đó (FR-DB-06).
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng ScoreSheet} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{ScoreSheetId} & \texttt{INT} & PK, IDENTITY & Mã định danh phiếu chấm. \\ \hline
+\texttt{EntryId} & \texttt{INT} & FK, NOT NULL & Bài dự thi được chấm. \\ \hline
+\texttt{JudgeUserId} & \texttt{INT} & FK, NOT NULL & Giám khảo chấm bài. \\ \hline
+\texttt{Status} & \texttt{VARCHAR(10)} & NOT NULL & Draft hoặc Locked; đã Locked thì bất biến (BR-7). \\ \hline
+\texttt{Comment} & \texttt{NVARCHAR(1000)} & NULL & Nhận xét chung của giám khảo về bài. \\ \hline
+\texttt{LockedAt} & \texttt{DATETIME} & NULL & Thời điểm chốt phiếu. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item UNIQUE (EntryId,\allowbreak{} JudgeUserId)
+    \item CHECK (Status IN ('Draft',\allowbreak{}'Locked'))
+    \item CHECK (Status = 'Draft' OR LockedAt IS NOT NULL)
+    \item ON DELETE: EntryId CASCADE,\allowbreak{} JudgeUserId RESTRICT
+\end{itemize}
+
+\subsection{Bảng \texttt{ScoreDetail} (Điểm theo tiêu chí)}
+
+Điểm của một phiếu chấm cho từng tiêu chí. Tách khỏi ScoreSheet là bắt buộc theo 2NF, xem mục chuẩn hóa ở Chương 3.
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng ScoreDetail} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{ScoreSheetId} & \texttt{INT} & PK, FK & Phiếu chấm chứa điểm này. \\ \hline
+\texttt{CriterionId} & \texttt{INT} & PK, FK & Tiêu chí được chấm. \\ \hline
+\texttt{Score} & \texttt{DECIMAL(5,2)} & NOT NULL & Điểm, phải nằm trong thang của tiêu chí (BR-5). \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (Score >= 0)
+    \item ON DELETE: ScoreSheetId CASCADE,\allowbreak{} CriterionId RESTRICT
+\end{itemize}
+
+\subsection{Bảng \texttt{AiAnalysis} (Kết quả phân tích)}
+
+Một lần mô hình phân tích một ảnh dự thi. Kết quả cũ không bị ghi đè nên một ảnh có nhiều bản ghi. Cảnh báo không tự loại bài, kết luận cuối do ban tổ chức đưa ra (BR-9).
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng AiAnalysis} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{AnalysisId} & \texttt{INT} & PK, IDENTITY & Mã định danh kết quả phân tích. \\ \hline
+\texttt{EntryPhotoId} & \texttt{INT} & FK, NOT NULL & Ảnh dự thi được phân tích. \\ \hline
+\texttt{ModelName} & \texttt{VARCHAR(120)} & NOT NULL & Tên mô hình đã sinh kết quả. \\ \hline
+\texttt{ModelVersion} & \texttt{VARCHAR(40)} & NOT NULL & Phiên bản mô hình, bắt buộc có để truy vết. \\ \hline
+\texttt{AnalysisType} & \texttt{VARCHAR(20)} & NOT NULL & Duplicate hoặc AiGenerated. \\ \hline
+\texttt{Confidence} & \texttt{DECIMAL(5,4)} & NOT NULL & Điểm tin cậy do mô hình trả về. \\ \hline
+\texttt{Verdict} & \texttt{VARCHAR(30)} & NOT NULL & Kết luận máy đưa ra. \\ \hline
+\texttt{AnalyzedAt} & \texttt{DATETIME} & NOT NULL & Thời điểm phân tích. \\ \hline
+\texttt{ReviewVerdict} & \texttt{VARCHAR(30)} & NULL & Kết luận cuối cùng của ban tổ chức. \\ \hline
+\texttt{ReviewedByUserId} & \texttt{INT} & FK, NULL & Người thẩm định. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (Confidence BETWEEN 0 AND 1)
+    \item CHECK (AnalysisType IN ('Duplicate',\allowbreak{}'AiGenerated'))
+    \item ON DELETE: EntryPhotoId CASCADE,\allowbreak{} ReviewedByUserId SET NULL
+\end{itemize}
+
+\subsection{Bảng \texttt{DuplicateMatch} (Cặp ảnh nghi trùng)}
+
+Quan hệ đệ quy trên ảnh dự thi: hai ảnh có độ tương đồng vượt ngưỡng. Mỗi cặp chỉ ghi một lần (BR-10).
+
+\begin{longtable}{|L{4cm}|L{3.15cm}|L{2.4cm}|L{4.55cm}|}
+\caption{Cấu trúc bảng DuplicateMatch} \\
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\hline
+\textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Ràng buộc} & \textbf{Mô tả} \\ \hline
+\endhead
+\texttt{MatchId} & \texttt{INT} & PK, IDENTITY & Mã định danh cặp nghi trùng. \\ \hline
+\texttt{PhotoAId} & \texttt{INT} & FK, NOT NULL & Ảnh thứ nhất của cặp. \\ \hline
+\texttt{PhotoBId} & \texttt{INT} & FK, NOT NULL & Ảnh thứ hai, cùng trỏ về EntryPhoto. \\ \hline
+\texttt{Similarity} & \texttt{DECIMAL(5,4)} & NOT NULL & Độ tương đồng đo được. \\ \hline
+\texttt{DetectedAt} & \texttt{DATETIME} & NOT NULL & Thời điểm phát hiện. \\ \hline
+\texttt{ReviewStatus} & \texttt{VARCHAR(20)} & NOT NULL & Pending, Confirmed hoặc Dismissed. \\ \hline
+\end{longtable}
+
+\noindent\textit{Ràng buộc mức bảng:}
+
+\begin{itemize}\raggedright
+    \item CHECK (PhotoAId < PhotoBId)
+    \item UNIQUE (PhotoAId,\allowbreak{} PhotoBId)
+    \item CHECK (Similarity BETWEEN 0 AND 1)
+    \item CHECK (ReviewStatus IN ('Pending',\allowbreak{}'Confirmed',\allowbreak{}'Dismissed'))
+    \item ON DELETE: PhotoAId NO ACTION,\allowbreak{} PhotoBId NO ACTION (SQL Server không cho cả hai khóa cùng CASCADE, xem mục 4.2)
+\end{itemize}
+

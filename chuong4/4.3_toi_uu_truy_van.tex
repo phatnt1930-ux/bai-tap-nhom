@@ -1,0 +1,28 @@
+\section{Tối ưu hóa truy xuất dữ liệu}
+
+Viết được câu lệnh SQL trả về đúng kết quả là chưa đủ. Với cùng một truy vấn, hệ quản trị có thể chọn nhiều kế hoạch thực thi khác nhau tùy theo chỉ mục hiện có, thống kê phân bố dữ liệu và chi phí ước lượng. Mục này xem xét một truy vấn tiêu biểu của hệ thống và các yếu tố quyết định hiệu năng của nó.
+
+\subsection{Câu lệnh SQL minh họa}
+
+Truy vấn dưới đây lấy mã dự thi và điểm tổng của các bài đạt trên 80 điểm thuộc hạng mục Chân dung. Đây là dạng truy vấn xuất hiện thường xuyên nhất khi ban tổ chức duyệt kết quả.
+
+\begin{lstlisting}[style=sqlstyle]
+SELECT e.EntryCode, e.FinalScore
+FROM   Entry    AS e
+JOIN   Category AS c ON c.CategoryId = e.CategoryId
+WHERE  e.FinalScore > 80
+  AND  c.CategoryName = N'Chan dung'
+ORDER BY e.FinalScore DESC;
+\end{lstlisting}
+
+Truy vấn gồm ba thành phần ảnh hưởng tới kế hoạch thực thi: điều kiện lọc trên \texttt{FinalScore}, phép nối bằng trên \texttt{CategoryId}, và yêu cầu sắp xếp giảm dần theo điểm.
+
+\subsection{Đánh giá thuật toán kết nối}
+
+SQL Server chọn Nested Loops, Hash Join hay Merge Join dựa trên thống kê, chỉ mục và chi phí ước lượng, chứ không theo một quy tắc cố định. Nested Loops thường phù hợp khi đầu vào phía ngoài nhỏ và phía trong có đường tra cứu hiệu quả; Hash Join phù hợp khi cả hai phía đều lớn và không có chỉ mục hỗ trợ.
+
+Với truy vấn trên, bảng \texttt{Category} có số dòng rất nhỏ so với \texttt{Entry}, và khóa chính \texttt{CategoryId} đã có chỉ mục gom cụm. Tuy nhiên không thể kết luận hệ quản trị chắc chắn chọn Nested Loops chỉ từ việc bảng nhỏ, vì ước lượng còn phụ thuộc số dòng thỏa điều kiện \texttt{FinalScore > 80}.
+
+Chỉ mục ghép \texttt{(CategoryId, FinalScore DESC)} kèm \texttt{INCLUDE (EntryCode)} trên \texttt{Entry}, đặt ở mục 4.2, phục vụ trực tiếp truy vấn này. Với mỗi \texttt{CategoryId} lấy từ \texttt{Category}, hệ quản trị tìm thẳng tới các bài trên 80 điểm của hạng mục đó theo thứ tự điểm giảm dần, và vì chỉ mục chứa sẵn \texttt{EntryCode} nên không phải tra cứu thêm vào bảng. Nếu chỉ một hạng mục thỏa điều kiện tên, bước sắp xếp có thể được bỏ qua; nếu nhiều cuộc thi cùng có hạng mục Chân dung thì vẫn cần một bước sắp xếp để trộn kết quả.
+
+Các nhận định trên là phân tích định tính dựa trên lý thuyết. Hiệu quả thực tế của chỉ mục được xác nhận bằng cách so sánh kế hoạch thực thi và thời gian chạy trước và sau khi tạo chỉ mục trên một tập dữ liệu đủ lớn.
